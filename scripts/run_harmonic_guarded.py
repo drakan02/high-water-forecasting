@@ -52,6 +52,7 @@ def _available_bytes() -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, required=True)
+    parser.add_argument("--tide-command", choices=("harmonic", "transfer-2010"), default="harmonic")
     parser.add_argument("--max-rss-gib", type=float, default=3.0)
     parser.add_argument("--min-available-gib", type=float, default=2.44)
     parser.add_argument("--timeout-minutes", type=float, default=60.0)
@@ -73,7 +74,7 @@ def main() -> int:
     env.setdefault("MPLCONFIGDIR", "/tmp/mpl-cache")
     env["PYTHONUNBUFFERED"] = "1"
     process = subprocess.Popen(
-        [sys.executable, "-u", "-m", "tide", "harmonic", "--config", str(config)],
+        [sys.executable, "-u", "-m", "tide", args.tide_command, "--config", str(config)],
         cwd=repo,
         env=env,
         stdout=subprocess.PIPE,

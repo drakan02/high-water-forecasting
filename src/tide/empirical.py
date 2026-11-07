@@ -185,7 +185,10 @@ def run_empirical(config_path: Path) -> dict[str, object]:
             split_map = {forecast_years[0]: f"validation_{forecast_years[0]}", forecast_years[1]: f"test_{forecast_years[1]}"}
         elif mode == "retrospective":
             forecast_years = [int(design_cfg["score_year"])]
-            split_map = {forecast_years[0]: "retrospective_in_sample_2007"}
+            split_map = {forecast_years[0]: f"retrospective_in_sample_{forecast_years[0]}"}
+        elif mode == "frozen_transfer":
+            forecast_years = [int(design_cfg["score_year"])]
+            split_map = {forecast_years[0]: f"test_{forecast_years[0]}"}
         else:
             raise ValueError(f"Unknown design mode {mode!r}")
         forecast_parts = []

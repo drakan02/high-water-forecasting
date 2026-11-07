@@ -1,0 +1,11 @@
+output_dir: data/clean/p5_gauge_only_evaluation
+designs:
+  - design_id: chronological_fit_through_2004
+    forecast_path: data/clean/p4_gauge_only_ecm/chronological_fit_through_2004/forecasts_unscored.parquet
+    labels_path: data/clean/p3_gauge_only_peaks/chronological_fit_through_2004/high_water_context.parquet
+  - design_id: retrospective_1988_2007
+    forecast_path: data/clean/p4_gauge_only_ecm/retrospective_1988_2007/forecasts_unscored.parquet
+    labels_path: data/clean/p3_gauge_only_peaks/retrospective_1988_2007/high_water.parquet
+  - design_id: avonmouth_transfer_2010_fit_1990_2009
+    forecast_path: data/clean/p5_transfer_2010/ecm/avonmouth_transfer_2010_fit_1990_2009/forecasts_unscored.parquet
+    labels_path: data/clean/p5_transfer_2010/high_water_2010.parquet

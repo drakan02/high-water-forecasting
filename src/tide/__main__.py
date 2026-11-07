@@ -14,6 +14,8 @@ from .harmonic import audit_history, run_harmonic
 from .prepare import prepare
 from .peaks import run_peak_cycles
 from .empirical import run_empirical
+from .evaluate import run_evaluation
+from .transfer import run_transfer_2010
 
 
 def ingest(config_path: Path) -> dict[str, object]:
@@ -49,6 +51,10 @@ def main() -> None:
     peaks_parser.add_argument("--config", type=Path, required=True)
     ecm_parser = subparsers.add_parser("ecm", help="fit and issue gauge-only high-water ECM forecasts")
     ecm_parser.add_argument("--config", type=Path, required=True)
+    evaluate_parser = subparsers.add_parser("evaluate", help="join frozen forecasts to labels and calculate paired peak metrics")
+    evaluate_parser.add_argument("--config", type=Path, required=True)
+    transfer_parser = subparsers.add_parser("transfer-2010", help="build frozen-through-2009 gauge-only 2010 transfer forecasts")
+    transfer_parser.add_argument("--config", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "ingest":
         result = ingest(args.config)
@@ -61,8 +67,12 @@ def main() -> None:
         result = run_harmonic(args.config)
     elif args.command == "peaks":
         result = run_peak_cycles(args.config)
-    else:
+    elif args.command == "ecm":
         result = run_empirical(args.config)
+    elif args.command == "evaluate":
+        result = run_evaluation(args.config)
+    else:
+        result = run_transfer_2010(args.config)
     print(json.dumps(result, indent=2, default=str))
 
 

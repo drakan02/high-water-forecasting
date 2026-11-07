@@ -1,0 +1,15 @@
+raw_file: data/raw/gesla_s3/avonmouth-avo-gbr-bodc.parquet
+design_id: avonmouth_transfer_2010_fit_1990_2009
+target_year: 2010
+fit_start: '1990-01-01'
+fit_end: '2009-12-31'
+constituents: auto
+trend: true
+nodal_corrections: true
+phase_convention: Greenwich
+confidence_intervals: none
+context_start_year: 2008
+context_end_year: 2011
+minimum_cycle_hours: 8
+maximum_cycle_hours: 16
+output_dir: data/clean/p5_transfer_2010

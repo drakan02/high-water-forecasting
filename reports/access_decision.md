@@ -24,3 +24,11 @@ The GESLA license page lists BODC as permitting research and consultancy, and re
 - Paper-aligned Table 1b input readiness: **BLOCKED** pending matching 2007 residual surge and location mapping.
 - Original BODC channel identity / datum: unresolved limitation, not a gauge-only processing blocker because no conversion or channel assertion is made.
 - Portbury: rejected as a substitute.
+
+## P1 real-data processing status
+
+P1 uses the local GESLA/BODC-lineage record only. The reader validates station, country, source lineage and schema; normalizes time to UTC and levels to metres without modifying source values; and retains original `qc_flag` and `use_flag`. Analysis-valid requires finite non-sentinel values with `use_flag=1` and `qc_flag=1`. The hourly product samples exact minute-00 values only. No interpolation, averaging, duplicate collapse, or channel combination is done.
+
+File-derived checks: 2007 has 35,040 expected/present source timestamps, 35,030 valid QC1/use1 rows, and 10 interpolated QC2 rows. The hourly product has 8,760 expected/present timestamps, 8,759 valid and one excluded QC slot. The P1 unit suite passes **6 tests** covering missing sentinel, suspect/use flags, duplicate timestamps, two channels at one timestamp, a missing minute-00 sample, and raw manifest schema/hash. The real-data run wrote hourly Parquet, monthly coverage/QC, raw manifest and a 14-day raw/hourly figure.
+
+P1 outputs are gauge-only and retain the unresolved datum/channel limitations above. No forecast, surge series, or Table 1b comparison was performed.

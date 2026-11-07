@@ -17,9 +17,12 @@ sources:
     source_url: https://gesla-dataset.s3.eu-west-1.amazonaws.com/parquet_files/avonmouth-avo-gbr-bodc.parquet
     query: "country=GBR, site_name=Avonmouth, year=2007, use_flag=1"
     raw_file: data/raw/gesla_s3/avonmouth-avo-gbr-bodc.parquet
+    cadence_minutes: 15
     expected_unit: m
     expected_datum: unknown_in_GESLA_record; no_conversion_applied
     qc: retain_original_flags; analysis_valid_use_flag_1_and_qc_flag_1
+    clean_dir: data/clean/avonmouth_2007_gesla_gauge_only
+    figure_path: reports/figures/avonmouth_2007_first_14_days_raw_vs_hourly.png
   surge:
     preferred: NOC_CS3X_hourly_residual_surge
     cadence_hours: 1
@@ -27,8 +30,10 @@ sources:
     raw_path: data/raw/noc_cs3x/avonmouth/
     grid_cell: unresolved_until_provider_data_or_metadata_received
 analysis:
+  hourly_gauge_rule: exact_minute_00_utc_sample_after_timezone_confirmation
   output_branch: gauge_only
-  table_1b_status: blocked_until_matching_2007_residual_surge_and_avonmouth_grid_mapping_are_verified
+  table_1b_status: blocked_until_original_gauge_channel_and_matching_2007_residual_surge_are_verified
+  metrics: [MAE_cm, RMSE_cm, bias_cm, paired_n, coverage]
   paper_table_1b:
     baseline_MAE_cm: 16.30
     baseline_RMSE_cm: 19.55

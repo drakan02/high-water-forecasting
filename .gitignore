@@ -13,3 +13,6 @@ runs/**
 .env.*
 *.token
 credentials.*
+
+# Python build metadata
+*.egg-info/

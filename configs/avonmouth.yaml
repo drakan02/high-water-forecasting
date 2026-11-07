@@ -1,0 +1,36 @@
+project: high-water-forecasting
+station:
+  id: avonmouth
+  name: Avonmouth
+  latitude: 51.51089
+  longitude: -2.71497
+  timezone: UTC
+  primary_period: [2007-01-01, 2007-12-31]
+  harmonic_fit_period: [1988-01-01, 2007-12-31]
+  required_gauge_period: [1988-01-01, 2007-12-31]
+  required_surge_period: [2007-01-01, 2007-12-31]
+  source_branch: gauge_only
+sources:
+  gauge:
+    preferred: GESLA_S3_BODC_record
+    product_version: "geslaR-queryable S3 record; underlying GESLA release not declared in object"
+    source_url: https://gesla-dataset.s3.eu-west-1.amazonaws.com/parquet_files/avonmouth-avo-gbr-bodc.parquet
+    query: "country=GBR, site_name=Avonmouth, year=2007, use_flag=1"
+    raw_file: data/raw/gesla_s3/avonmouth-avo-gbr-bodc.parquet
+    expected_unit: m
+    expected_datum: unknown_in_GESLA_record; no_conversion_applied
+    qc: retain_original_flags; analysis_valid_use_flag_1_and_qc_flag_1
+  surge:
+    preferred: NOC_CS3X_hourly_residual_surge
+    cadence_hours: 1
+    expected_unit: m
+    raw_path: data/raw/noc_cs3x/avonmouth/
+    grid_cell: unresolved_until_provider_data_or_metadata_received
+analysis:
+  output_branch: gauge_only
+  table_1b_status: blocked_until_matching_2007_residual_surge_and_avonmouth_grid_mapping_are_verified
+  paper_table_1b:
+    baseline_MAE_cm: 16.30
+    baseline_RMSE_cm: 19.55
+    ecm_MAE_cm: 9.05
+    ecm_RMSE_cm: 11.59

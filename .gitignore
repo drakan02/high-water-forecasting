@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.codegraph/
+
+# Downloaded observations, credentials, and generated run outputs stay local.
+data/raw/**
+!data/raw/**/.gitkeep
+data/clean/**
+runs/**
+*.env
+.env.*
+*.token
+credentials.*

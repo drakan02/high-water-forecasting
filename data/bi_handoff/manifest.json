@@ -1,0 +1,153 @@
+{
+  "tables": {
+    "DimStation": {
+      "rows": 1,
+      "columns": [
+        "station_key",
+        "station_name",
+        "country",
+        "latitude",
+        "longitude",
+        "source",
+        "datum",
+        "channel",
+        "surge_available"
+      ]
+    },
+    "DimDate": {
+      "rows": 1082,
+      "columns": [
+        "date",
+        "date_key",
+        "year",
+        "quarter",
+        "month",
+        "month_name",
+        "day"
+      ]
+    },
+    "DimModel": {
+      "rows": 2,
+      "columns": [
+        "model_key",
+        "model_name",
+        "model_class",
+        "unit",
+        "branch"
+      ]
+    },
+    "DimRun": {
+      "rows": 3,
+      "columns": [
+        "design_id",
+        "run_key",
+        "station_key",
+        "fit_period",
+        "evaluation_period",
+        "branch",
+        "issue_lead_hours",
+        "surge_status",
+        "availability_assumption"
+      ]
+    },
+    "FactForecast": {
+      "rows": 5640,
+      "columns": [
+        "station_key",
+        "cycle_id",
+        "design_id",
+        "split",
+        "target_date",
+        "target_time_utc",
+        "forecast_origin_utc",
+        "issue_lead_hours",
+        "target_type",
+        "forecast_inputs_available",
+        "target_present",
+        "target_eligible",
+        "paired_eligible",
+        "paired_sample_id",
+        "observed_H_m",
+        "surge_m",
+        "surge_status",
+        "A_N_m",
+        "lag_n_minus_2_cycle_id",
+        "lag_n_minus_2_e_m",
+        "lag_n_minus_4_cycle_id",
+        "lag_n_minus_4_e_m",
+        "lag_n_minus_6_cycle_id",
+        "lag_n_minus_6_e_m",
+        "ECM_correction_m",
+        "model_sha256",
+        "exclusion_reason",
+        "model_key",
+        "prediction_m",
+        "error_cm",
+        "date_key",
+        "fact_forecast_key"
+      ]
+    },
+    "FactQuality": {
+      "rows": 8760,
+      "columns": [
+        "time_utc",
+        "station_id",
+        "year",
+        "H_raw_m",
+        "H_hourly_m",
+        "A_m",
+        "residual_m",
+        "hourly_valid",
+        "source_qc_flag",
+        "source_qc_label",
+        "source_use_flag",
+        "timestamp_present",
+        "qc_reason",
+        "datum",
+        "unit",
+        "model_id",
+        "design_id",
+        "station_key",
+        "date_key",
+        "fact_quality_key"
+      ]
+    },
+    "FactSpectrum": {
+      "rows": 338,
+      "columns": [
+        "design_id",
+        "frequency_cycles_per_hour",
+        "psd_m2_per_cycle_per_hour",
+        "fs_samples_per_hour",
+        "window",
+        "nperseg_hours",
+        "noverlap_hours",
+        "detrend",
+        "station_key",
+        "model_key",
+        "spectrum_key"
+      ]
+    },
+    "expected_slice_metrics": {
+      "rows": 12,
+      "columns": [
+        "slice",
+        "design_id",
+        "split",
+        "model_key",
+        "paired_cycle_count",
+        "fact_rows",
+        "MAE_cm",
+        "RMSE_cm"
+      ]
+    }
+  },
+  "ui_status": "UI_PENDING; no Power BI Desktop available in this Linux environment",
+  "validation_slices": [
+    "all pilot by run/model",
+    "chronological test January 2007",
+    "single cycle avonmouth:chronological_fit_through_2004:20061231T2300Z"
+  ],
+  "paired_policy": "Both model rows share the same cycle eligibility; each measure filters paired_eligible and report page must select one run/target.",
+  "source_sha256": "92b5731e2d3426832704ffae29281ef6a43b10168bc58c517d96a915b20ce810"
+}

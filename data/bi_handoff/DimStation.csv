@@ -1,0 +1,2 @@
+station_key,station_name,country,latitude,longitude,source,datum,channel,surge_available
+avonmouth,Avonmouth,GBR,51.50775,-2.71275,"GESLA S3, BODC lineage",unknown,unresolved,False

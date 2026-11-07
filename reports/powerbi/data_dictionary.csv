@@ -1,0 +1,102 @@
+table,column,dtype,unit,key_role,description
+DimStation,station_key,str,none,PK,Stable station identifier.
+DimStation,station_name,str,none,,Readable station name.
+DimStation,country,str,none,,ISO country code.
+DimStation,latitude,float64,none,,Station latitude in decimal degrees.
+DimStation,longitude,float64,none,,Station longitude in decimal degrees.
+DimStation,source,str,none,,Source lineage label.
+DimStation,datum,str,none,,Vertical datum metadata; source datum unknown.
+DimStation,channel,str,none,,Original measurement channel; unresolved.
+DimStation,surge_available,bool,none,,Whether matched surge is available.
+DimDate,date,str,none,,Calendar date in UTC.
+DimDate,date_key,str,none,PK,UTC date foreign key formatted YYYYMMDD.
+DimDate,year,int32,none,,UTC calendar year.
+DimDate,quarter,int32,none,,Calendar quarter.
+DimDate,month,int32,none,,Calendar month number.
+DimDate,month_name,str,none,,Calendar month name.
+DimDate,day,int32,none,,Day of month.
+DimModel,model_key,str,none,PK,Stable forecast model key.
+DimModel,model_name,str,none,,Readable model name.
+DimModel,model_class,str,none,,Model family.
+DimModel,unit,str,none,,"Source unit; metres, no datum conversion."
+DimModel,branch,str,none,,Experiment target branch.
+DimRun,design_id,str,none,,Locked model design and run identifier.
+DimRun,run_key,str,none,PK,Unique run dimension key.
+DimRun,station_key,str,none,FK,Stable station identifier.
+DimRun,fit_period,str,none,,Training period represented by run.
+DimRun,evaluation_period,str,none,,Evaluation period represented by run.
+DimRun,branch,str,none,,Experiment target branch.
+DimRun,issue_lead_hours,int64,none,,Configured lead time from origin to target.
+DimRun,surge_status,str,none,,Explicit availability status; H−A is never treated as surge.
+DimRun,availability_assumption,str,none,,Forecast-side observation latency assumption.
+FactForecast,station_key,str,none,FK,Stable station identifier.
+FactForecast,cycle_id,str,none,,Immutable high-water cycle identifier.
+FactForecast,design_id,str,none,FK,Locked model design and run identifier.
+FactForecast,split,str,none,,Chronological validation/test or retrospective split.
+FactForecast,target_date,str,none,,UTC date of observed high water.
+FactForecast,target_time_utc,"datetime64[us, UTC]",UTC,,Observed target high-water timestamp in UTC.
+FactForecast,forecast_origin_utc,"datetime64[us, UTC]",UTC,,Forecast issue origin in UTC.
+FactForecast,issue_lead_hours,float64,none,,Configured lead time from origin to target.
+FactForecast,target_type,str,none,,Forecast target; this project is gauge-only total observed water level.
+FactForecast,forecast_inputs_available,bool,none,,All required forecast-side inputs were available.
+FactForecast,target_present,bool,none,,Observed target row is present.
+FactForecast,target_eligible,bool,none,,Target passed P3 peak QC and coverage rules.
+FactForecast,paired_eligible,bool,none,,Common cycle is eligible and has both model predictions.
+FactForecast,paired_sample_id,str,none,,SHA-256 digest identifying the common cycle set for this run/split.
+FactForecast,observed_H_m,float64,m,,Observed high-water elevation in source metres; datum is unresolved.
+FactForecast,surge_m,float64,m,,Matching surge input; null because no validated product is available.
+FactForecast,surge_status,str,none,,Explicit availability status; H−A is never treated as surge.
+FactForecast,A_N_m,float64,m,,UTide harmonic prediction at the target event.
+FactForecast,lag_n_minus_2_cycle_id,str,none,,Cycle ID for lag two high waters earlier.
+FactForecast,lag_n_minus_2_e_m,float64,m,,"Gauge-only H−A residual at lag N−2, metres."
+FactForecast,lag_n_minus_4_cycle_id,str,none,,Cycle ID for lag four high waters earlier.
+FactForecast,lag_n_minus_4_e_m,float64,m,,"Gauge-only H−A residual at lag N−4, metres."
+FactForecast,lag_n_minus_6_cycle_id,str,none,,Cycle ID for lag six high waters earlier.
+FactForecast,lag_n_minus_6_e_m,float64,m,,"Gauge-only H−A residual at lag N−6, metres."
+FactForecast,ECM_correction_m,float64,m,,OLS correction in metres.
+FactForecast,model_sha256,str,none,,Hash of persisted fitted model.
+FactForecast,exclusion_reason,str,none,,"Reason target/forecast is excluded, if any."
+FactForecast,model_key,str,none,FK,Stable forecast model key.
+FactForecast,prediction_m,float64,m,,Model high-water prediction in metres.
+FactForecast,error_cm,float64,cm,,"Observed total H minus prediction, in centimetres."
+FactForecast,date_key,str,none,FK,UTC date foreign key formatted YYYYMMDD.
+FactForecast,fact_forecast_key,str,none,PK,"Stable hash key for design, cycle, and model row."
+FactQuality,time_utc,"datetime64[us, UTC]",UTC,,UTC hourly observation timestamp.
+FactQuality,station_id,str,none,,Exported station_id field from FactQuality.
+FactQuality,year,int64,none,,UTC calendar year.
+FactQuality,H_raw_m,float64,m,,"Source level at the exact hourly sample, in metres."
+FactQuality,H_hourly_m,float64,m,,QC-valid hourly observed level in metres; invalid values remain null.
+FactQuality,A_m,float64,m,,UTide harmonic prediction in metres.
+FactQuality,residual_m,float64,m,,"H−A diagnostic residual, not validated surge."
+FactQuality,hourly_valid,bool,none,,P1 analysis-valid flag for the hourly observation.
+FactQuality,source_qc_flag,Int64,none,,Original GESLA QC flag.
+FactQuality,source_qc_label,str,none,,Readable label for original QC flag.
+FactQuality,source_use_flag,Int64,none,,Original source use flag.
+FactQuality,timestamp_present,bool,none,,Expected timestamp exists in source.
+FactQuality,qc_reason,str,none,,P1 decision/reason for hourly observation.
+FactQuality,datum,str,none,,Vertical datum metadata; source datum unknown.
+FactQuality,unit,str,none,,"Source unit; metres, no datum conversion."
+FactQuality,model_id,str,none,,Harmonic model identifier.
+FactQuality,design_id,str,none,,Locked model design and run identifier.
+FactQuality,station_key,str,none,FK,Stable station identifier.
+FactQuality,date_key,str,none,FK,UTC date foreign key formatted YYYYMMDD.
+FactQuality,fact_quality_key,str,none,PK,Unique station-hour fact key in UTC.
+FactSpectrum,design_id,str,none,FK,Locked model design and run identifier.
+FactSpectrum,frequency_cycles_per_hour,float64,none,,Welch frequency axis in cycles per hour.
+FactSpectrum,psd_m2_per_cycle_per_hour,float64,m,,Welch power spectral density in m²/(cycles/hour).
+FactSpectrum,fs_samples_per_hour,float64,none,,Sampling frequency used by Welch.
+FactSpectrum,window,str,none,,Welch window function.
+FactSpectrum,nperseg_hours,int64,none,,Welch segment duration in hours.
+FactSpectrum,noverlap_hours,int64,none,,Welch segment overlap in hours.
+FactSpectrum,detrend,str,none,,Welch detrending method.
+FactSpectrum,station_key,str,none,FK,Stable station identifier.
+FactSpectrum,model_key,str,none,FK,Stable forecast model key.
+FactSpectrum,spectrum_key,str,none,PK,Run/frequency key for spectrum row.
+expected_slice_metrics,slice,str,none,,Validation slice name.
+expected_slice_metrics,design_id,str,none,,Locked model design and run identifier.
+expected_slice_metrics,split,str,none,,Chronological validation/test or retrospective split.
+expected_slice_metrics,model_key,str,none,,Stable forecast model key.
+expected_slice_metrics,paired_cycle_count,int64,none,,Distinct common cycles in this slice.
+expected_slice_metrics,fact_rows,int64,none,,Number of model-specific fact rows in this slice.
+expected_slice_metrics,MAE_cm,float64,cm,,Python expected mean absolute error in centimetres.
+expected_slice_metrics,RMSE_cm,float64,cm,,Python expected root mean square error in centimetres.

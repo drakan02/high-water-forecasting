@@ -1,0 +1,4 @@
+design_id,run_key,station_key,fit_period,evaluation_period,branch,issue_lead_hours,surge_status,availability_assumption
+chronological_fit_through_2004,chronological_fit_through_2004,avonmouth,harmonic through 2004; ECM fit 2005,validation 2006 and test 2007,gauge_only,24,unavailable; no surge inferred from H-A,QC high-water value available at recorded peak time; provider latency unknown
+retrospective_1988_2007,retrospective_1988_2007,avonmouth,retrospective harmonic/ECM 1988–2007 in-sample,in-sample 2007,gauge_only,24,unavailable; no surge inferred from H-A,QC high-water value available at recorded peak time; provider latency unknown
+avonmouth_transfer_2010_fit_1990_2009,avonmouth_transfer_2010_fit_1990_2009,avonmouth,harmonic fit 1990–2009; ECM fit 2009,transfer test 2010,gauge_only,24,unavailable; no surge inferred from H-A,QC high-water value available at recorded peak time; provider latency unknown

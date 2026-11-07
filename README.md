@@ -10,6 +10,7 @@ Reproducible Avonmouth pilot based on Hibbert et al. (2015). Each phase is isola
 - **P3 gauge-only high-water table: DONE.** Each harmonic design yields 705 2007 semidiurnal cycles; 704 have complete gauge coverage, and one cycle containing the source QC gap is excluded without interpolation. P3 retains 2004–2008 cycles for training lags. See `reports/acceptance/P3.md`.
 - **P4 gauge-only ECM forecasts: DONE.** Chronological OLS trained on 636 eligible 2005 cycles (full rank 4), validated on 2006, then issued 702/705 24-hour 2007 forecasts. A separate 2007 retrospective fit is in-sample. Forecast artifacts do not include target H; see `reports/acceptance/P4.md`.
 - **P5 gauge-only evaluation: DONE.** Paired metrics were recomputed from scored outputs for 2006 validation (n=650), chronological 2007 test (n=701), retrospective in-sample 2007 (n=701), and a frozen-through-2009 transfer test in 2010 (n=645). On the gauge-only test splits, ECM MAE was 16.29 cm (2007) and 14.63 cm (2010); all 16 published-table delta fields remain null because these total-water-level predictions are not comparable with the paper's surge-corrected target. The transfer model uses 1990–2009 UTide and 2009 OLS training. See `reports/acceptance/P5.md`.
+- **P6 Power BI data handoff: DONE; UI_PENDING.** Generated a star schema with DimStation/Date/Model/Run and FactForecast/Quality/Spectrum, parameterized Power Query, guarded DAX metrics, data dictionary, relationships and a four-page visual specification. Validation reproduces all run/model scores, a January 2007 slice (n=60 per model), and one selected peak. Power BI Desktop refresh and slicer interaction remain `UI_PENDING` because this run environment is Linux. See `reports/acceptance/P6.md`.
 - **Direct Table 1b reproduction: BLOCKED separately.** No matching 2007 NOC CS3X residual-surge file or Avonmouth grid mapping. Do not calculate surge as `H-A`; the P2 residual may contain meteorological effects and model error.
 
 The source is not the original BODC file. Do not claim the GESLA record is a specific original BODC channel or convert its unspecified datum. The record is suitable for a labeled gauge-only experiment, not direct equivalence to paper EHM or Table 1b.
@@ -38,10 +39,12 @@ UV_CACHE_DIR=/tmp/uv-cache MPLCONFIGDIR=/tmp/mpl-cache uv run python -m tide ecm
 UV_CACHE_DIR=/tmp/uv-cache MPLCONFIGDIR=/tmp/mpl-cache uv run python scripts/run_harmonic_guarded.py --tide-command transfer-2010 --config configs/p5_transfer_2010.yaml
 UV_CACHE_DIR=/tmp/uv-cache MPLCONFIGDIR=/tmp/mpl-cache uv run python -m tide ecm --config configs/p5_transfer_2010_ecm.yaml
 UV_CACHE_DIR=/tmp/uv-cache MPLCONFIGDIR=/tmp/mpl-cache uv run python -m tide evaluate --config configs/p5_evaluation.yaml
+UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/build_powerbi_handoff.py
+UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/validate_powerbi_handoff.py
 ```
 
 The two P2 fits were run with one BLAS/OpenMP thread under a 3 GiB process-tree RSS watchdog and a 60-minute deadline. `ingest` validates the configured local source and writes the raw manifest. `prepare` writes the exact-minute-00 hourly Parquet, monthly QC/coverage, manifest and first-14-days plot. The source is not automatically fetched.
 
 ## Phase gate
 
-P2–P5 gauge-only outputs are complete and accepted on their phase branches. P4/P5 are gauge-only adaptations; they do not establish equivalence with the paper's surge-corrected ECM. Keep the paper-aligned Table 1b path blocked until matched surge and original-source metadata are available. The P2 residual is not a verified surge hindcast. P5 replay and acceptance details are in `reports/acceptance/P5.md`.
+P2–P6 gauge-only outputs are complete and accepted on their phase branches; P6's data handoff is accepted while its desktop UI evidence is marked `UI_PENDING`. P4/P5 are gauge-only adaptations; they do not establish equivalence with the paper's surge-corrected ECM. Keep the paper-aligned Table 1b path blocked until matched surge and original-source metadata are available. The P2 residual is not a verified surge hindcast. Acceptance details are in `reports/acceptance/`.

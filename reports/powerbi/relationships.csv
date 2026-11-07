@@ -1,0 +1,10 @@
+from_table,from_column,to_table,to_column,cardinality,direction,active,notes
+DimStation,station_key,FactForecast,station_key,1:many,single,yes,Station filters forecast detail
+DimStation,station_key,FactQuality,station_key,1:many,single,yes,Station filters hourly QC
+DimStation,station_key,FactSpectrum,station_key,1:many,single,yes,Station filters residual spectrum
+DimRun,run_key,FactForecast,design_id,1:many,single,yes,Select exactly one run for paired comparisons
+DimRun,run_key,FactSpectrum,design_id,1:many,single,yes,Run filters residual spectrum
+DimModel,model_key,FactForecast,model_key,1:many,single,yes,Long fact has one row per model/cycle/run
+DimModel,model_key,FactSpectrum,model_key,1:many,single,yes,Spectrum is from harmonic baseline
+DimDate,date_key,FactForecast,date_key,1:many,single,yes,Date is derived from target high-water time
+DimDate,date_key,FactQuality,date_key,1:many,single,no,Inactive role; activate explicitly for quality date visuals

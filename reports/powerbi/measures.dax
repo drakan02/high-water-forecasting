@@ -1,0 +1,53 @@
+Peak Count =
+CALCULATE(
+    DISTINCTCOUNT(FactForecast[cycle_id]),
+    FactForecast[paired_eligible] = TRUE(),
+    NOT ISBLANK(FactForecast[error_cm])
+)
+
+MAE (cm) =
+VAR EligibleRows =
+    FILTER(
+        FactForecast,
+        FactForecast[paired_eligible] = TRUE()
+            && NOT ISBLANK(FactForecast[error_cm])
+    )
+RETURN
+    IF(
+        COUNTROWS(EligibleRows) = 0,
+        BLANK(),
+        AVERAGEX(EligibleRows, ABS(FactForecast[error_cm]))
+    )
+
+RMSE (cm) =
+VAR EligibleRows =
+    FILTER(
+        FactForecast,
+        FactForecast[paired_eligible] = TRUE()
+            && NOT ISBLANK(FactForecast[error_cm])
+    )
+RETURN
+    IF(
+        COUNTROWS(EligibleRows) = 0,
+        BLANK(),
+        SQRT(AVERAGEX(EligibleRows, POWER(FactForecast[error_cm], 2)))
+    )
+
+Baseline MAE (cm) =
+CALCULATE([MAE (cm)], KEEPFILTERS(DimModel[model_key] = "harmonic_baseline"))
+
+ECM MAE (cm) =
+CALCULATE([MAE (cm)], KEEPFILTERS(DimModel[model_key] = "gauge_only_ecm"))
+
+MAE Gain (cm) =
+VAR NBase = CALCULATE([Peak Count], KEEPFILTERS(DimModel[model_key] = "harmonic_baseline"))
+VAR NECM = CALCULATE([Peak Count], KEEPFILTERS(DimModel[model_key] = "gauge_only_ecm"))
+RETURN
+    IF(NBase = 0 || NECM = 0 || NBase <> NECM, BLANK(), [Baseline MAE (cm)] - [ECM MAE (cm)])
+
+Observed High Water Count =
+CALCULATE(
+    DISTINCTCOUNT(FactForecast[cycle_id]),
+    FactForecast[target_present] = TRUE(),
+    FactForecast[target_eligible] = TRUE()
+)

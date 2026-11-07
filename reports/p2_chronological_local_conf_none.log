@@ -1,0 +1,4 @@
+RUN_START chronological confidence_intervals=none
+UTIDE_START n=123271 constit=auto conf_int=none
+UTIDE_DONE seconds=4.6 python_peak_rss_mib=1722.0
+RUN_DONE seconds=6.3 result={'design_id': 'chronological_fit_through_2004', 'model_id': 'UTide-0.4.0', 'fit_valid_observations': 123271, 'fit_constituents': 68, 'hourly_rows': 8760, 'hourly_H_valid': 8759, 'hourly_A_valid': 8760, 'hourly_residual_valid': 8759, 'spectrum_hours': 8511, 'outputs': 'data/clean/p2_gauge_only/chronological_fit_through_2004'}

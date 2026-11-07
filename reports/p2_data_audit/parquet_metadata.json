@@ -1,0 +1,28 @@
+{
+  "path": "data/raw/gesla_s3/avonmouth-avo-gbr-bodc.parquet",
+  "size_bytes": 5180521,
+  "sha256": "7a796fcb64215becd2fb429b75a48be5afcb392c613a7f54e509c36250e71bb8",
+  "manifest_sha256": "7a796fcb64215becd2fb429b75a48be5afcb392c613a7f54e509c36250e71bb8",
+  "sha_matches_manifest": true,
+  "schema": "date_time: timestamp[us]\nyear: int64\nmonth: int64\nday: int64\nhour: int64\ncountry: string\nsite_name: string\nlat: double\nlon: double\nsea_level: double\nqc_flag: int64\nuse_flag: int64\nfile_name: string\n-- schema metadata --\npandas: '{\"index_columns\": [{\"kind\": \"range\", \"name\": null, \"start\": 0, \"' + 1717",
+  "schema_metadata": {
+    "pandas": "{\"index_columns\": [{\"kind\": \"range\", \"name\": null, \"start\": 0, \"stop\": 853104, \"step\": 1}], \"column_indexes\": [{\"name\": null, \"field_name\": null, \"pandas_type\": \"unicode\", \"numpy_type\": \"object\", \"metadata\": {\"encoding\": \"UTF-8\"}}], \"columns\": [{\"name\": \"date_time\", \"field_name\": \"date_time\", \"pandas_type\": \"datetime\", \"numpy_type\": \"datetime64[ns]\", \"metadata\": null}, {\"name\": \"year\", \"field_name\": \"year\", \"pandas_type\": \"int64\", \"numpy_type\": \"int64\", \"metadata\": null}, {\"name\": \"month\", \"field_name\": \"month\", \"pandas_type\": \"int64\", \"numpy_type\": \"int64\", \"metadata\": null}, {\"name\": \"day\", \"field_name\": \"day\", \"pandas_type\": \"int64\", \"numpy_type\": \"int64\", \"metadata\": null}, {\"name\": \"hour\", \"field_name\": \"hour\", \"pandas_type\": \"int64\", \"numpy_type\": \"int64\", \"metadata\": null}, {\"name\": \"country\", \"field_name\": \"country\", \"pandas_type\": \"unicode\", \"numpy_type\": \"object\", \"metadata\": null}, {\"name\": \"site_name\", \"field_name\": \"site_name\", \"pandas_type\": \"unicode\", \"numpy_type\": \"object\", \"metadata\": null}, {\"name\": \"lat\", \"field_name\": \"lat\", \"pandas_type\": \"float64\", \"numpy_type\": \"float64\", \"metadata\": null}, {\"name\": \"lon\", \"field_name\": \"lon\", \"pandas_type\": \"float64\", \"numpy_type\": \"float64\", \"metadata\": null}, {\"name\": \"sea_level\", \"field_name\": \"sea_level\", \"pandas_type\": \"float64\", \"numpy_type\": \"float64\", \"metadata\": null}, {\"name\": \"qc_flag\", \"field_name\": \"qc_flag\", \"pandas_type\": \"int64\", \"numpy_type\": \"int64\", \"metadata\": null}, {\"name\": \"use_flag\", \"field_name\": \"use_flag\", \"pandas_type\": \"int64\", \"numpy_type\": \"int64\", \"metadata\": null}, {\"name\": \"file_name\", \"field_name\": \"file_name\", \"pandas_type\": \"unicode\", \"numpy_type\": \"object\", \"metadata\": null}], \"creator\": {\"library\": \"pyarrow\", \"version\": \"9.0.0\"}, \"pandas_version\": \"1.5.0\"}"
+  },
+  "row_groups": 1,
+  "rows": 853104,
+  "created_by": "parquet-cpp-arrow version 9.0.0",
+  "first_time_utc": "1961-01-01T00:00:00+00:00",
+  "last_time_utc": "2012-04-30T23:45:00+00:00",
+  "timestamp_physical_type": "timestamp[us]",
+  "timestamp_timezone_in_schema": null,
+  "station": "Avonmouth",
+  "country": "GBR",
+  "latitude": 51.50775,
+  "longitude": -2.71275,
+  "source_ids": [
+    "avonmouth-avo-gbr-bodc"
+  ],
+  "unit": "m per GESLA field documentation; no datum in Parquet metadata",
+  "channel": "one GESLA/BODC-lineage record; original channel ID absent",
+  "yearly_coverage_csv": "reports/p2_data_audit/yearly_coverage.csv"
+}

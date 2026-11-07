@@ -1,0 +1,14 @@
+base_config: configs/avonmouth.yaml
+harmonic_design:
+  design_id: chronological_fit_through_2004
+  label: strictly historical gauge-only UTide baseline frozen after 2004
+  fit_start: '1988-01-01'
+  fit_end: '2004-12-31'
+  constituents: auto
+  method: ols
+  confidence_intervals: none
+  trend: true
+  nodal_corrections: true
+  phase_convention: Greenwich
+  output_dir: data/clean/p2_gauge_only/chronological_fit_through_2004
+  score_year: 2007

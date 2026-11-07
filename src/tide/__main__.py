@@ -12,6 +12,7 @@ import yaml
 from .ingest import raw_manifest, read_gesla_parquet
 from .harmonic import audit_history, run_harmonic
 from .prepare import prepare
+from .peaks import run_peak_cycles
 
 
 def ingest(config_path: Path) -> dict[str, object]:
@@ -43,6 +44,8 @@ def main() -> None:
     audit_parser.add_argument("--out-dir", type=Path, default=Path("reports/p2_data_audit"))
     harmonic_parser = subparsers.add_parser("harmonic", help="fit and reconstruct one configured UTide baseline")
     harmonic_parser.add_argument("--config", type=Path, required=True)
+    peaks_parser = subparsers.add_parser("peaks", help="extract stable gauge-only semi-diurnal high-water cycles")
+    peaks_parser.add_argument("--config", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "ingest":
         result = ingest(args.config)
@@ -51,8 +54,10 @@ def main() -> None:
     elif args.command == "audit-history":
         config = yaml.safe_load(args.config.read_text(encoding="utf-8"))
         result = audit_history(Path(config["sources"]["gauge"]["raw_file"]), args.out_dir)
-    else:
+    elif args.command == "harmonic":
         result = run_harmonic(args.config)
+    else:
+        result = run_peak_cycles(args.config)
     print(json.dumps(result, indent=2, default=str))
 
 

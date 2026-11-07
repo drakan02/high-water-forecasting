@@ -1,0 +1,13 @@
+base_config: configs/avonmouth.yaml
+target_year: 2007
+context_start_year: 2004
+context_end_year: 2008
+cycle_boundary_rule: consecutive_minima_of_A
+cycle_interval: left_closed_right_open
+minimum_cycle_hours: 8
+maximum_cycle_hours: 16
+require_complete_hourly_gauge_window: true
+design_configs:
+  - configs/p2_gauge_only_chronological.yaml
+  - configs/p2_gauge_only_retrospective.yaml
+output_dir: data/clean/p3_gauge_only_peaks

@@ -13,6 +13,7 @@ from .ingest import raw_manifest, read_gesla_parquet
 from .harmonic import audit_history, run_harmonic
 from .prepare import prepare
 from .peaks import run_peak_cycles
+from .empirical import run_empirical
 
 
 def ingest(config_path: Path) -> dict[str, object]:
@@ -46,6 +47,8 @@ def main() -> None:
     harmonic_parser.add_argument("--config", type=Path, required=True)
     peaks_parser = subparsers.add_parser("peaks", help="extract stable gauge-only semi-diurnal high-water cycles")
     peaks_parser.add_argument("--config", type=Path, required=True)
+    ecm_parser = subparsers.add_parser("ecm", help="fit and issue gauge-only high-water ECM forecasts")
+    ecm_parser.add_argument("--config", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "ingest":
         result = ingest(args.config)
@@ -56,8 +59,10 @@ def main() -> None:
         result = audit_history(Path(config["sources"]["gauge"]["raw_file"]), args.out_dir)
     elif args.command == "harmonic":
         result = run_harmonic(args.config)
-    else:
+    elif args.command == "peaks":
         result = run_peak_cycles(args.config)
+    else:
+        result = run_empirical(args.config)
     print(json.dumps(result, indent=2, default=str))
 
 

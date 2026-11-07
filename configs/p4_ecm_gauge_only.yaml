@@ -1,0 +1,16 @@
+output_dir: data/clean/p4_gauge_only_ecm
+issue_lead_hours: 24
+lag_steps: [2, 4, 6]
+minimum_fit_rows: 20
+designs:
+  - design_id: chronological_fit_through_2004
+    mode: chronological
+    high_water_context: data/clean/p3_gauge_only_peaks/chronological_fit_through_2004/high_water_context.parquet
+    fit_year: 2005
+    validation_year: 2006
+    score_year: 2007
+  - design_id: retrospective_1988_2007
+    mode: retrospective
+    high_water_context: data/clean/p3_gauge_only_peaks/retrospective_1988_2007/high_water_context.parquet
+    fit_year: 2007
+    score_year: 2007

@@ -1,0 +1,25 @@
+{
+  "metric_rows": 176,
+  "ports": 44,
+  "forecast_rows": 119220,
+  "status_counts": [
+    {
+      "model": "ECM-OLS-3lag",
+      "status": "DONE",
+      "rows": 84
+    },
+    {
+      "model": "ECM-OLS-3lag",
+      "status": "NOT_APPLICABLE_PER_PAPER",
+      "rows": 4
+    },
+    {
+      "model": "UTide-0.4.0",
+      "status": "DONE",
+      "rows": 88
+    }
+  ],
+  "target": "total_observed_water_level_gauge_only",
+  "metric_scope": "paired high-water cycles only; UTide and ECM on identical forecastable cycle IDs",
+  "metrics_csv_sha256": "3a0ff3932607cc2f1f80838eb8f71b8e9c3ed5d9901274fed829725cdc5162b7"
+}

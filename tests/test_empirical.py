@@ -81,6 +81,32 @@ def test_ols_recovers_registered_three_lag_model_with_intercept() -> None:
     assert len(rows) == n and model["design_matrix_rank"] == 4
 
 
+def test_ols_accepts_frozen_multi_year_training_window() -> None:
+    n = 80
+    index = np.arange(n, dtype=float)
+    x = np.column_stack([np.sin(index / 2), np.cos(index / 3), (index % 7) / 7])
+    truth = np.array([0.5, 0.25, 0.1, 0.01])
+    target_delta = np.column_stack([x, np.ones(n)]) @ truth
+    times = pd.DatetimeIndex([
+        *pd.date_range("2008-01-01", periods=40, freq="12h", tz="UTC"),
+        *pd.date_range("2009-01-01", periods=40, freq="12h", tz="UTC"),
+    ])
+    fit = pd.DataFrame({
+        "A_peak_time_utc": times,
+        "high_water_eligible": True,
+        "forecast_inputs_available": True,
+        "H_peak_m": 5 + target_delta,
+        "A_peak_m": 5.0,
+        "lag_n_minus_2_e_m": x[:, 0],
+        "lag_n_minus_4_e_m": x[:, 1],
+        "lag_n_minus_6_e_m": x[:, 2],
+    })
+    model, rows = fit_ecm_ols(fit, fit_years=(2008, 2009))
+    np.testing.assert_allclose([model["C1"], model["C2"], model["C3"], model["C4_intercept_m"]], truth, rtol=0, atol=1e-12)
+    assert model["fit_years"] == [2008, 2009]
+    assert len(rows) == n
+
+
 def test_ecm_prediction_matches_registered_hand_calculation() -> None:
     inputs = pd.DataFrame({
         "forecast_inputs_available": [True],

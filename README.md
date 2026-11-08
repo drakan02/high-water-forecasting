@@ -83,6 +83,28 @@ The raw Newlyn object is available at `https://gesla-dataset.s3.eu-west-1.amazon
 
 The source trial for Avonmouth BODC/GTSM remains separate: no original BODC download or GTSM series/point has been validated. The P8 direct Table 1(b) conclusion remains unchanged.
 
+## P12: 44-port network expansion
+
+P12 inspects 46 actual public GESLA S3 BODC-lineage station objects (44 map one-to-one to the Hibbert Table 2 ports; Felixstowe and Moray Firth are retained as non-paper inventory records). It fits UTide 0.4.0 independently for each matched port using exact-minute-00 finite, non-fill observations with `qc_flag=1` and `use_flag=1`, from the later of 1990-01-01 or the source record's first date through 2009. The 2010 frozen transfer uses ECM OLS with N−2/N−4/N−6 lags and a 24-hour issue lead. A second fit scores 2006–2009 retrospectively in-sample. UTide and ECM metrics use identical forecastable peak IDs; the target is total observed water level in metres, not surge. Port Ellen and Bournemouth keep their harmonic outputs and are marked `NOT_APPLICABLE_PER_PAPER` for ECM, matching the article's multiple-high/low-water exclusion.
+
+The 2010 comparison across the 42 ECM-applicable ports has 22,267 paired station-cycle rows: UTide MAE/RMSE 12.71/16.93 cm and ECM 9.71/13.16 cm. The retrospective 2006–2009 comparison has 91,445 paired rows: UTide 14.15/18.91 cm and ECM 11.01/15.40 cm. Candidate UTide intervals vary from 705 to 1,256 per port, with 13 to 701 eligible after the locked duration and QC rules; all counts are reported by port. Bournemouth and Weymouth have unusually high candidate counts and Sheerness has only 13 eligible peaks, so per-port cycle correspondence remains an explicit limitation. These pooled metrics weight each paired peak equally and do not reproduce Hibbert Table 2: the input is GESLA/BODC-lineage, UTide substitutes for EHM, source datum/channel are unresolved, no surge term is used, and the retrospective results are in-sample. The direct Table 1(b) P8 conclusion remains unchanged.
+
+Reviewable artifacts are in `reports/network_2010/`: source inventory and SHA-256 manifest, per-port run status, station fit manifest, 2,991 UTide constituent rows, 84 ECM model coefficient records, 176 model/port/period metric rows, 119,220 paired peak records in Parquet, and scoring manifest. Raw 46-object source Parquet files remain ignored under `data/raw/gesla_s3/` and are not redistributed. The unified project matrix is `reports/results/model_port_period_target.csv`.
+
+Replay from the repository root after installing the locked environment:
+
+```bash
+UV_CACHE_DIR=/tmp/uv-cache uv sync --locked
+UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/download_p12_gesla_bodc.py
+UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/build_p12_network_inventory.py
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 MPLCONFIGDIR=/tmp/mpl-cache PYTHONPATH=src UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/run_p12_network_2010.py --config configs/p12_network_2010.yaml
+UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/score_p12_network_2010.py --config configs/p12_network_2010.yaml
+UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/export_p12_models.py --config configs/p12_network_2010.yaml
+PYTHONPATH=src UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q
+```
+
+The runner uses one BLAS thread, a 3 GiB process-tree RSS cap, 2.44 GiB minimum host-available memory and a 60-minute per-station timeout. It runs stations sequentially and records configs/logs locally. The downloader verifies the registered SHA-256 and never replaces a mismatched local file. See `reports/acceptance/P12.md` for source coverage, paired metrics, hashes and gate evidence.
+
 
 ## Newport 2010 network extension
 

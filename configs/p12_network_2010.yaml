@@ -1,0 +1,14 @@
+inventory_csv: reports/network_2010/gesla_bodc_station_inventory.csv
+output_dir: data/clean/p12_network_2010
+fit_start_floor: '1990-01-01'
+fit_end: '2009-12-31'
+context_start_floor_year: 2006
+context_end_year: 2011
+score_year: 2010
+ecm_fit_years: [2006, 2007, 2008, 2009]
+issue_lead_hours: 24
+lag_steps: [2, 4, 6]
+minimum_fit_rows: 20
+max_rss_gib: 3.0
+min_available_gib: 2.44
+timeout_minutes: 60

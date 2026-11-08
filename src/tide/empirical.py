@@ -83,12 +83,20 @@ def build_forecast_inputs(
 def fit_ecm_ols(
     design: pd.DataFrame,
     *,
-    fit_year: int,
+    fit_year: int | None = None,
+    fit_years: tuple[int, ...] | None = None,
     minimum_samples: int = 20,
 ) -> tuple[dict[str, object], pd.DataFrame]:
     """Fit delta H_N = H_N - A_N against e_(N-2/-4/-6), with intercept."""
+    if fit_years is None:
+        if fit_year is None:
+            raise ValueError("Specify fit_year or fit_years")
+        fit_years = (int(fit_year),)
+    fit_years = tuple(sorted({int(year) for year in fit_years}))
+    if not fit_years:
+        raise ValueError("fit_years must not be empty")
     fit = design.loc[
-        design["A_peak_time_utc"].dt.year.eq(fit_year)
+        design["A_peak_time_utc"].dt.year.isin(fit_years)
         & design["high_water_eligible"].astype(bool)
         & design["forecast_inputs_available"].astype(bool)
     ].copy()
@@ -96,7 +104,7 @@ def fit_ecm_ols(
     fit["target_delta_m"] = pd.to_numeric(fit["H_peak_m"], errors="coerce") - pd.to_numeric(fit["A_peak_m"], errors="coerce")
     fit = fit.dropna(subset=feature_names + ["target_delta_m"])
     if len(fit) < minimum_samples:
-        raise ValueError(f"Insufficient forecastable ECM training rows for {fit_year}: {len(fit)} < {minimum_samples}")
+        raise ValueError(f"Insufficient forecastable ECM training rows for {fit_years}: {len(fit)} < {minimum_samples}")
     x = fit[feature_names].to_numpy(dtype=float)
     matrix = np.column_stack([x, np.ones(len(x), dtype=float)])
     y = fit["target_delta_m"].to_numpy(dtype=float)
@@ -104,9 +112,11 @@ def fit_ecm_ols(
     if rank != matrix.shape[1]:
         raise ValueError(f"ECM training design matrix is rank deficient: rank={rank}, columns={matrix.shape[1]}")
     coef, _, _, _ = np.linalg.lstsq(matrix, y, rcond=None)
+    fit_label = str(fit_years[0]) if len(fit_years) == 1 else f"{fit_years[0]}_{fit_years[-1]}"
     model = {
-        "model_id": f"gauge_only_ecm_ols_fit_{fit_year}",
-        "fit_year": int(fit_year),
+        "model_id": f"gauge_only_ecm_ols_fit_{fit_label}",
+        "fit_year": int(fit_years[0]) if len(fit_years) == 1 else None,
+        "fit_years": list(fit_years),
         "fit_rows": int(len(fit)),
         "feature_order": feature_names,
         "C1": float(coef[0]),
@@ -161,14 +171,16 @@ def run_empirical(config_path: Path) -> dict[str, object]:
         )
         design_id = str(design_cfg["design_id"])
         mode = str(design_cfg["mode"])
-        fit_year = int(design_cfg["fit_year"])
+        configured_fit_years = design_cfg["fit_years"] if "fit_years" in design_cfg else [design_cfg["fit_year"]]
+        fit_years = tuple(int(year) for year in configured_fit_years)
+        fit_year = int(fit_years[0]) if len(fit_years) == 1 else None
         fit_data = features.merge(
             peaks[["cycle_number", "H_peak_m", "A_peak_m", "high_water_eligible", "exclusion_reason"]],
             on="cycle_number", how="left", validate="one_to_one",
         )
         fit_data["A_peak_time_utc"] = fit_data["forecast_target_time_utc"]
         model, fit_rows = fit_ecm_ols(
-            fit_data, fit_year=fit_year, minimum_samples=int(config["minimum_fit_rows"]),
+            fit_data, fit_years=fit_years, minimum_samples=int(config["minimum_fit_rows"]),
         )
         # The fit uses joined training labels; forecast inputs remain a separate pre-label table.
         design_dir = output_root / design_id
@@ -184,8 +196,9 @@ def run_empirical(config_path: Path) -> dict[str, object]:
             forecast_years = [int(design_cfg["validation_year"]), int(design_cfg["score_year"])]
             split_map = {forecast_years[0]: f"validation_{forecast_years[0]}", forecast_years[1]: f"test_{forecast_years[1]}"}
         elif mode == "retrospective":
-            forecast_years = [int(design_cfg["score_year"])]
-            split_map = {forecast_years[0]: f"retrospective_in_sample_{forecast_years[0]}"}
+            configured_score_years = design_cfg["score_years"] if "score_years" in design_cfg else [design_cfg["score_year"]]
+            forecast_years = [int(year) for year in configured_score_years]
+            split_map = {year: f"retrospective_in_sample_{year}" for year in forecast_years}
         elif mode == "frozen_transfer":
             forecast_years = [int(design_cfg["score_year"])]
             split_map = {forecast_years[0]: f"test_{forecast_years[0]}"}
@@ -215,6 +228,7 @@ def run_empirical(config_path: Path) -> dict[str, object]:
             "design_id": design_id,
             "mode": mode,
             "fit_year": fit_year,
+            "fit_years": list(fit_years),
             "fit_rows": model["fit_rows"],
             "design_matrix_rank": model["design_matrix_rank"],
             "design_matrix_columns": model["design_matrix_columns"],

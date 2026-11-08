@@ -1,0 +1,10 @@
+{
+  "s3_catalog_prefix": "parquet_files/",
+  "catalog_objects_total": 5119,
+  "gbr_bodc_objects": 46,
+  "paper_station_matches": 44,
+  "downloaded_bytes": 291688461,
+  "raw_files_redistributed": false,
+  "output_csv": "reports/network_2010/gesla_bodc_station_inventory.csv",
+  "output_sha256": "af64db53d5652ef9f29502a668c6dd148ace60216f3102d89ffd3b597aeb75c2"
+}

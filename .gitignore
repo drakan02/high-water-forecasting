@@ -13,3 +13,6 @@ runs/**
 .env.*
 *.token
 credentials.*
+
+# Keep the local study protocol out of GitHub branch contents.
+/SOP_Tai_lap_Hibbert_2015.md

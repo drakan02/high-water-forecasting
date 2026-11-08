@@ -55,6 +55,7 @@ def extract_high_water_cycles(
     target_year: int | None,
     minimum_cycle_hours: float = 8.0,
     maximum_cycle_hours: float = 16.0,
+    station_id: str = "avonmouth",
 ) -> pd.DataFrame:
     """Pair consecutive low-water minima, then maximize A and H separately per cycle."""
     required = {"time_utc", "H_m", "A_m", "analysis_valid"}
@@ -108,9 +109,9 @@ def extract_high_water_cycles(
             reason.append("cycle_duration_outside_registered_bounds")
         if bool(left["plateau_ambiguous"]) or bool(right["plateau_ambiguous"]):
             reason.append("harmonic_low_water_plateau_earliest_center_used")
-        cycle_id = f"avonmouth:{design_id}:{times[start_i].strftime('%Y%m%dT%H%MZ')}"
+        cycle_id = f"{station_id}:{design_id}:{times[start_i].strftime('%Y%m%dT%H%MZ')}"
         records.append({
-            "station_id": "avonmouth",
+            "station_id": station_id,
             "branch": "gauge_only",
             "design_id": design_id,
             "cycle_number": number,

@@ -1,16 +1,16 @@
 # Next actions
 
-Current accepted phase: P10, Newlyn Species Concordance substitute. P8 remains the separate direct Table 1(b) input audit; its conclusion is unchanged. The accepted experiments target total observed water level H where storm-surge residual is unavailable.
+Accepted through P11 on `phase/newport-network-transfer`. P8's direct Table 1(b) result remains unchanged: a matched historical CS3X residual and original BODC channel/datum are still unverified. P11 adds a second-port gauge-only 2010 result and covers two of the article's 44 network locations including Avonmouth.
 
-## Next phase
+## Next phase: remaining network stations
 
-Create the Newport and network-transfer phase from the accepted P10 commit. Before fitting, inventory public Newport and other network-station records, verify station identity, time span, cadence, QC and units from the actual files, and freeze the site/model comparison design. Keep every registered model and port in the output regardless of skill. Where only gauge data exists, label the target total H and do not infer surge from H minus a tide prediction.
+Create a separate network expansion phase from the accepted P11 commit. Inventory the remaining paper stations against actual public source objects, validate each station's metadata/cadence/QC and run eligible registered methods without filtering on skill. Extend `reports/results/model_port_period_target.csv`; keep total-H gauge-only scores separate from surge-corrected paper metrics. Newport and Avonmouth are the current two sites, not the full network.
 
-After network forecasts and paired peak metrics are validated, make the Power BI handoff/dashboard phase from its own branch. Preserve the model × port × period × target matrix, peak-level paired metrics, source lineage, and replay commands.
+After the network matrix is complete or each remaining station has a documented source-specific blocker, create a dedicated Power BI phase. Start from the existing dashboard and bind it to validated forecast tables and the matrix. Preserve paired peak IDs, QC coverage, forecast origin, lag trace and target labels. Validate dashboard counts against Python paired CSVs; mark Desktop-only refresh/UI checks pending if Power BI Desktop is unavailable.
 
-## User-side source access
+## Direct paper source access still needed
 
-- BODC: use the official processed all-channels portal in a browser. Register/sign in there if prompted, select Avonmouth 2007 and download the original annual processed/NTSLF file unchanged to `data/raw/bodc/avonmouth/`. Do not share credentials in chat.
-- Copernicus CDS: sign in/register on the CDS site, open `sis-water-level-change-timeseries-cmip6`, select GTSM 3.0 ERA5 reanalysis, storm-surge residual, hourly, 2007 January, v3, ZIP, accept the displayed terms, and submit. Save the portal-generated API request and ZIP under `data/raw/copernicus_gtsm/avonmouth_trial/`; keep any token local.
+- BODC: register/sign in on BODC in the browser, download Avonmouth 2007 processed all-channel/NTSLF data unchanged to `data/raw/bodc/avonmouth/`.
+- Copernicus CDS: sign in, accept the dataset terms, request GTSM 3.0 ERA5 hourly storm-surge residual for January 2007, and save the generated query and ZIP under `data/raw/copernicus_gtsm/avonmouth_trial/`. Keep credentials/token local.
 
-Neither a suitable GTSM point nor the required original BODC channel/datum has been validated. Do not use the UTide residual as surge. P8's direct Table 1(b) result remains pending those compatible inputs.
+No NOC email is planned. Never use H−A as storm surge.

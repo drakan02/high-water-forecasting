@@ -82,3 +82,10 @@ PYTHONPATH=src python -m pytest -q
 The raw Newlyn object is available at `https://gesla-dataset.s3.eu-west-1.amazonaws.com/parquet_files/newlyn-new-gbr-bodc.parquet`; the GESLA S3 release number is not encoded in its file metadata. Monthly QC counts, coefficient transfer factors, metric tables and artifact checksums are stored in the ignored local output directory `data/clean/p10_species_newlyn/`.
 
 The source trial for Avonmouth BODC/GTSM remains separate: no original BODC download or GTSM series/point has been validated. The P8 direct Table 1(b) conclusion remains unchanged.
+
+
+## Newport 2010 network extension
+
+P11 acquired the UK Newport GESLA S3 object `newport-npo-gbr-bodc.parquet` (6,038,181 bytes; SHA-256 `6b3addc9c07f6e19f1ad07cc83a3cfeded96073c1e9a95e41cbbab3b7fedb6b9`). Analysis uses exact minute-00 records passing GESLA `use_flag=1` and `qc_flag=1`; source unit is metres, while original BODC channel/datum and exact GESLA release remain unresolved. UTide fits 1993–2009, then an ECM fit on 2009 scores 2010 total observed H on 605 common eligible high-water cycles. This second-port result is not a surge-corrected Table 2 reproduction; 42 of the paper's 44 network locations remain outside this run. See `reports/acceptance/P11.md` and `reports/results/model_port_period_target.csv`.
+
+Replay commands are listed in the P11 acceptance report. If the ignored local source file is absent, download it from the public S3 object URL recorded in `data/source_inventory.csv`.

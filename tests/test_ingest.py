@@ -5,10 +5,12 @@ import pytest
 
 from tide.ingest import (
     DuplicateTimestampError,
+    IngestError,
     normalize_gesla,
     prepare_hourly,
     raw_manifest,
     read_gesla_parquet,
+    read_gesla_station_parquet,
 )
 
 
@@ -110,3 +112,27 @@ def test_manifest_hashes_original_parquet_and_lists_its_columns(tmp_path) -> Non
     assert "time_utc" not in manifest["source_columns"]
     assert '"date_time"' in manifest["source_columns"]
     assert manifest["source_rows"] == 1
+
+
+def test_station_reader_supports_exact_newport_source_without_weakening_avonmouth_default(tmp_path) -> None:
+    source = gesla_rows([("2007-01-01 00:00", 4.1, 1, 1)])
+    source["site_name"] = "Newport"
+    source["lat"] = 51.55
+    source["lon"] = -2.987444
+    source["file_name"] = "newport-npo-gbr-bodc"
+    path = tmp_path / "newport.parquet"
+    source.to_parquet(path, index=False)
+
+    frame, identity = read_gesla_station_parquet(
+        path,
+        expected_station="Newport",
+        expected_country="GBR",
+        expected_source_ids=("newport-npo-gbr-bodc",),
+    )
+    hourly, _ = prepare_hourly(frame, 2007, station_id="newport")
+
+    assert identity.station == "Newport"
+    assert identity.source_ids == ("newport-npo-gbr-bodc",)
+    assert hourly.iloc[0]["station_id"] == "newport"
+    with pytest.raises(IngestError, match="exact site_name 'Avonmouth'"):
+        read_gesla_parquet(path)

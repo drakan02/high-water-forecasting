@@ -10,14 +10,23 @@ import pandas as pd
 import yaml
 
 from .harmonic import fit_utide, reconstruct_from_saved_state, save_reconstruction_state, _coefficient_rows
-from .ingest import normalize_gesla, prepare_hourly, read_gesla_parquet
+from .ingest import normalize_gesla, prepare_hourly, read_gesla_station_parquet
 from .peaks import extract_high_water_cycles
 
 
 def run_transfer_2010(config_path: Path) -> dict[str, object]:
     config = yaml.safe_load(Path(config_path).read_text(encoding="utf-8"))
     raw_path = Path(config["raw_file"])
-    frame, identity = read_gesla_parquet(raw_path)
+    expected_station = str(config.get("expected_station", "Avonmouth"))
+    expected_country = str(config.get("expected_country", "GBR"))
+    expected_source_ids = tuple(config.get("expected_source_ids", ("avonmouth-avo-gbr-bodc",)))
+    frame, identity = read_gesla_station_parquet(
+        raw_path,
+        expected_station=expected_station,
+        expected_country=expected_country,
+        expected_source_ids=expected_source_ids,
+    )
+    station_id = str(config.get("station_id", "avonmouth"))
     normalized = normalize_gesla(frame)
     fit_start = str(config["fit_start"])
     fit_end = str(config["fit_end"])
@@ -41,7 +50,7 @@ def run_transfer_2010(config_path: Path) -> dict[str, object]:
     )
     state_model.to_csv(output / "harmonic_coefficients.csv", index=False)
 
-    hourly_parts = [prepare_hourly(frame, year)[0] for year in range(int(config["context_start_year"]), int(config["context_end_year"]) + 1)]
+    hourly_parts = [prepare_hourly(frame, year, station_id=station_id)[0] for year in range(int(config["context_start_year"]), int(config["context_end_year"]) + 1)]
     hourly = pd.concat(hourly_parts, ignore_index=True)
     times = pd.DatetimeIndex(pd.to_datetime(hourly["time_utc"], utc=True))
     hourly["A_m"] = reconstruct_from_saved_state(times, state_path)
@@ -50,6 +59,7 @@ def run_transfer_2010(config_path: Path) -> dict[str, object]:
         hourly, design_id=design_id, target_year=None,
         minimum_cycle_hours=float(config["minimum_cycle_hours"]),
         maximum_cycle_hours=float(config["maximum_cycle_hours"]),
+        station_id=station_id,
     )
     target_year = int(config["target_year"])
     target = context.loc[pd.to_datetime(context["A_peak_time_utc"], utc=True).dt.year.eq(target_year)].reset_index(drop=True)
@@ -59,6 +69,9 @@ def run_transfer_2010(config_path: Path) -> dict[str, object]:
     context_summary = {
         "design_id": design_id,
         "model_id": "UTide-0.4.0",
+        "station_id": station_id,
+        "station": identity.station,
+        "source_ids": list(identity.source_ids),
         "source_sha256": hashlib.sha256(raw_path.read_bytes()).hexdigest(),
         "fit_start": fit_start,
         "fit_end": fit_end,

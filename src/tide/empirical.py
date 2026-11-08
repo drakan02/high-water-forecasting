@@ -36,7 +36,7 @@ def build_forecast_inputs(
     for target in data.itertuples(index=False):
         origin = target.A_peak_time_utc - pd.Timedelta(hours=issue_lead_hours)
         row = {
-            "station_id": "avonmouth",
+            "station_id": str(target.station_id) if hasattr(target, "station_id") else "avonmouth",
             "branch": "gauge_only",
             "design_id": target.design_id,
             "cycle_number": int(target.cycle_number),

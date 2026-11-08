@@ -63,8 +63,14 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def read_gesla_parquet(path: Path) -> tuple[pd.DataFrame, SourceIdentity]:
-    """Read an unmodified GESLA query/file and verify its station identity."""
+def read_gesla_station_parquet(
+    path: Path,
+    *,
+    expected_station: str,
+    expected_country: str = "GBR",
+    expected_source_ids: tuple[str, ...] | None = None,
+) -> tuple[pd.DataFrame, SourceIdentity]:
+    """Read an unmodified GESLA file and verify its declared station lineage."""
     path = Path(path)
     if not path.is_file():
         raise FileNotFoundError(path)
@@ -76,21 +82,21 @@ def read_gesla_parquet(path: Path) -> tuple[pd.DataFrame, SourceIdentity]:
     frame = pd.read_parquet(path)
     if frame.empty:
         raise IngestError(f"No records in {path}")
-    if set(frame["site_name"].dropna().unique()) != {"Avonmouth"}:
-        raise IngestError("Source must contain only the exact site_name 'Avonmouth'")
-    if set(frame["country"].dropna().unique()) != {"GBR"}:
-        raise IngestError("Source must contain only country code GBR")
-    if set(frame["file_name"].dropna().unique()) != {"avonmouth-avo-gbr-bodc"}:
-        raise IngestError("Source lineage is not the verified Avonmouth BODC record")
+    if set(frame["site_name"].dropna().unique()) != {expected_station}:
+        raise IngestError(f"Source must contain only the exact site_name {expected_station!r}")
+    if set(frame["country"].dropna().unique()) != {expected_country}:
+        raise IngestError(f"Source must contain only country code {expected_country}")
+    source_ids = tuple(sorted(frame["file_name"].dropna().unique()))
+    if expected_source_ids is not None and source_ids != tuple(sorted(expected_source_ids)):
+        raise IngestError(f"Source lineage mismatch: expected {expected_source_ids}, got {source_ids}")
     if frame["date_time"].isna().any():
         raise IngestError("Source contains null timestamps")
 
     times = pd.to_datetime(frame["date_time"], utc=True)
     frame["time_utc"] = times
-    source_ids = tuple(sorted(frame["file_name"].dropna().unique()))
     identity = SourceIdentity(
-        station="Avonmouth",
-        country="GBR",
+        station=expected_station,
+        country=expected_country,
         latitude=float(frame["lat"].median()),
         longitude=float(frame["lon"].median()),
         source_ids=source_ids,
@@ -99,6 +105,16 @@ def read_gesla_parquet(path: Path) -> tuple[pd.DataFrame, SourceIdentity]:
         last_time_utc=times.max(),
     )
     return frame, identity
+
+
+def read_gesla_parquet(path: Path) -> tuple[pd.DataFrame, SourceIdentity]:
+    """Read and validate the project's original Avonmouth GESLA input."""
+    return read_gesla_station_parquet(
+        path,
+        expected_station="Avonmouth",
+        expected_country="GBR",
+        expected_source_ids=("avonmouth-avo-gbr-bodc",),
+    )
 
 
 def normalize_gesla(frame: pd.DataFrame) -> pd.DataFrame:
@@ -138,7 +154,9 @@ def _check_unique_timestamps(frame: pd.DataFrame) -> None:
         )
 
 
-def prepare_hourly(frame: pd.DataFrame, year: int) -> tuple[pd.DataFrame, dict[str, int]]:
+def prepare_hourly(
+    frame: pd.DataFrame, year: int, *, station_id: str = "avonmouth"
+) -> tuple[pd.DataFrame, dict[str, int]]:
     """Sample exact minute-00 records onto a complete hourly UTC grid.
 
     No averaging, interpolation, channel combination, or duplicate collapse is done.
@@ -164,7 +182,7 @@ def prepare_hourly(frame: pd.DataFrame, year: int) -> tuple[pd.DataFrame, dict[s
     exact = exact.set_index("time_utc").reindex(expected)
     hourly = pd.DataFrame(index=expected)
     hourly.index.name = "time_utc"
-    hourly["station_id"] = "avonmouth"
+    hourly["station_id"] = station_id
     hourly["year"] = year
     hourly["level_m_raw"] = exact["level_m_raw"]
     hourly["level_m"] = exact["level_m"]

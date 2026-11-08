@@ -1,0 +1,10 @@
+output_dir: data/clean/p11_newport_transfer_2010/ecm
+issue_lead_hours: 24
+lag_steps: [2, 4, 6]
+minimum_fit_rows: 20
+designs:
+  - design_id: newport_transfer_2010_fit_1993_2009
+    mode: frozen_transfer
+    high_water_context: data/clean/p11_newport_transfer_2010/high_water_context.parquet
+    fit_year: 2009
+    score_year: 2010

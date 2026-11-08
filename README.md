@@ -67,4 +67,18 @@ OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=src timeou
 PYTHONPATH=src python -m pytest -q
 ```
 
-The public-source access result remains separate from this experiment. BODC's listing marks Avonmouth 2007 unrestricted, but its anonymous query POST returned HTTP 503; CDS GTSM requires user-side sign-in/terms acceptance, and no GTSM coordinates were verified. Follow `reports/public_source_trial/source_access.md`; do not claim a point has been selected.
+
+## Newlyn species-transfer substitute
+
+`phase/species-concordance-newlyn` acquired the public GESLA S3 Newlyn BODC-lineage file directly (10.4 MB; SHA-256 and source details in `data/source_inventory.csv`). It has Newlyn observations through 2021, while its original BODC channel and datum are unresolved. The reported method is a species-banded complex harmonic-transfer approximation using UTide; the SHOM MAS implementation is unavailable, so this is not exact Species Concordance or direct Table 1 reproduction. It uses the 2006 overlap for calibration and 2007 for held-out scoring, compares on 8,759 hourly observations and the same 704 P3 high-water cycle IDs, and retains both model results even though transferred hourly metrics are worse. Every target is total observed H, gauge-only. See `reports/acceptance/P10.md` and the versioned design decision.
+
+To replay after the ignored Avonmouth/P3 inputs and the Newlyn raw object are available locally:
+
+```bash
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=src timeout 300 python -m tide species --config configs/p10_species_newlyn.yaml
+PYTHONPATH=src python -m pytest -q
+```
+
+The raw Newlyn object is available at `https://gesla-dataset.s3.eu-west-1.amazonaws.com/parquet_files/newlyn-new-gbr-bodc.parquet`; the GESLA S3 release number is not encoded in its file metadata. Monthly QC counts, coefficient transfer factors, metric tables and artifact checksums are stored in the ignored local output directory `data/clean/p10_species_newlyn/`.
+
+The source trial for Avonmouth BODC/GTSM remains separate: no original BODC download or GTSM series/point has been validated. The P8 direct Table 1(b) conclusion remains unchanged.

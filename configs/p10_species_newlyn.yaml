@@ -1,0 +1,7 @@
+avonmouth_file: data/raw/gesla_s3/avonmouth-avo-gbr-bodc.parquet
+newlyn_file: data/raw/gesla_s3/newlyn-new-gbr-bodc.parquet
+p3_peak_file: data/clean/species_public_inputs/accepted_p3_high_water_2007.parquet
+training_year: 2006
+score_year: 2007
+output_dir: data/clean/p10_species_newlyn
+design_id: SC_BANDED_COMPLEX_TRANSFER_NEWLYN_2006_TO_AVONMOUTH_2007

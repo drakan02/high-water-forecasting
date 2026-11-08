@@ -1,16 +1,16 @@
 # Next actions
 
-Current branch: `phase/ann-avonmouth-public` (P9). The accepted P9 experiment is a gauge-only public-source substitute; P8's direct Table 1(b) limitation is unchanged.
+Current accepted phase: P10, Newlyn Species Concordance substitute. P8 remains the separate direct Table 1(b) input audit; its conclusion is unchanged. The accepted experiments target total observed water level H where storm-surge residual is unavailable.
 
-## Next phase after P9 commit
+## Next phase
 
-Create a separate phase branch from the accepted P9 commit for Species Concordance with Newlyn. First inspect existing Newlyn source objects and the paper/repository definition of Species Concordance; freeze its target and comparison set before fitting. Keep the result labeled as a method substitute if the original source or exact implementation is unavailable.
+Create the Newport and network-transfer phase from the accepted P10 commit. Before fitting, inventory public Newport and other network-station records, verify station identity, time span, cadence, QC and units from the actual files, and freeze the site/model comparison design. Keep every registered model and port in the output regardless of skill. Where only gauge data exists, label the target total H and do not infer surge from H minus a tide prediction.
 
-Then assess Newport and network transfer on separate phase branches, retaining every port/model result regardless of score. Keep source coverage, station metadata and target definitions explicit. Only add Power BI views after the validated prediction tables and paired metrics exist.
+After network forecasts and paired peak metrics are validated, make the Power BI handoff/dashboard phase from its own branch. Preserve the model × port × period × target matrix, peak-level paired metrics, source lineage, and replay commands.
 
 ## User-side source access
 
-- BODC: open the official processed all-channels listing, select the Avonmouth 2007 row, add it to the basket, choose the NTSLF/ASCII download and save the returned file unchanged under `data/raw/bodc/avonmouth/`. The catalog marks the row unrestricted. If the browser requests an account, register/sign in on BODC there; do not share credentials in chat.
-- Copernicus CDS: sign in or register on the CDS website, open `sis-water-level-change-timeseries-cmip6`, choose GTSM 3.0 ERA5 reanalysis, storm surge residual, hourly, year 2007, month January, version v3, ZIP, accept the displayed terms and submit. Save the portal-generated API request and downloaded ZIP under `data/raw/copernicus_gtsm/avonmouth_trial/`. Keep the token on the user's machine.
+- BODC: use the official processed all-channels portal in a browser. Register/sign in there if prompted, select Avonmouth 2007 and download the original annual processed/NTSLF file unchanged to `data/raw/bodc/avonmouth/`. Do not share credentials in chat.
+- Copernicus CDS: sign in/register on the CDS site, open `sis-water-level-change-timeseries-cmip6`, select GTSM 3.0 ERA5 reanalysis, storm-surge residual, hourly, 2007 January, v3, ZIP, accept the displayed terms, and submit. Save the portal-generated API request and ZIP under `data/raw/copernicus_gtsm/avonmouth_trial/`; keep any token local.
 
-No GTSM candidate point has yet been verified. Do not interpret the UTide residual as surge. Direct Table 1(b) reproduction remains unverified until the surge location and source/channel/datum compatibility are established.
+Neither a suitable GTSM point nor the required original BODC channel/datum has been validated. Do not use the UTide residual as surge. P8's direct Table 1(b) result remains pending those compatible inputs.

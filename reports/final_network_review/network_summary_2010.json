@@ -1,0 +1,48 @@
+{
+  "scope": "P12 heldout_2010 transfer; gauge-only total observed water level",
+  "source": "reports/network_2010/network_forecasts_paired.parquet",
+  "target": "total_observed_water_level_gauge_only",
+  "period": "heldout_2010",
+  "unit": "cm for errors and gains; source predictions stored in metres",
+  "pair_key": [
+    "station_id",
+    "cycle_id"
+  ],
+  "pair_checks": {
+    "selected_candidate_rows": 23377,
+    "valid_paired_rows": 22267,
+    "duplicate_station_cycle_keys": 0,
+    "same_H_A_ECM_target_and_issue_origin": true,
+    "not_applicable_ports": [
+      "p22_port_ellen",
+      "p41_bournemouth"
+    ],
+    "not_applicable_reason": "Paper excludes ECM at locations with multiple high/low waters per day"
+  },
+  "ports_scored": 42,
+  "port_mae_categories": {
+    "improved": 42,
+    "equal": 0,
+    "worse": 0
+  },
+  "port_improvement_pct": 100.0,
+  "median_station_gain_mae_cm": 2.618393249177681,
+  "event_pair_abs_error_categories": {
+    "improved": 14204,
+    "equal": 0,
+    "worse": 8063
+  },
+  "event_pair_improvement_pct": 63.789464229577405,
+  "pooled_pair_metrics": {
+    "n_pairs": 22267,
+    "utide_mae_cm": 12.706906442185588,
+    "ecm_mae_cm": 9.711735808955016,
+    "utide_rmse_cm": 16.930379087705187,
+    "ecm_rmse_cm": 13.156395541851317,
+    "gain_mae_cm": 2.995170633230572,
+    "gain_rmse_cm": 3.77398354585387
+  },
+  "classification": "strict comparison of unrounded float64 gain_mae_cm; no tie tolerance",
+  "input_p12_paired_metric_sha256": "3a0ff3932607cc2f1f80838eb8f71b8e9c3ed5d9901274fed829725cdc5162b7",
+  "input_p12_forecast_parquet_sha256": "01126f1852eaf3961d6d4ce9adb6cdfb5fb41e6f71e8f0ee10b5db8f8a21ba1d"
+}

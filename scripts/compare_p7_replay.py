@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import argparse
 
 import numpy as np
 import pandas as pd
@@ -41,7 +42,11 @@ def compare(label: str, accepted: Path, replayed: Path, key: str,
                     "tolerance": tolerance, "status": "PASS"})
 
 
-def run() -> pd.DataFrame:
+def run(replay_root: Path = REPLAY, comparison_path: Path = ROOT / "reports/p7_replay/comparison.csv") -> pd.DataFrame:
+    global REPLAY
+    REPLAY = replay_root if replay_root.is_absolute() else ROOT / replay_root
+    comparison_path = comparison_path if comparison_path.is_absolute() else ROOT / comparison_path
+    RESULTS.clear()
     compare("P1 hourly", ROOT / "data/clean/avonmouth_2007_gesla_gauge_only/hourly.parquet",
             REPLAY / "p1/hourly.parquet", "time_utc", ("level_m_raw", "level_m"),
             ("analysis_valid", "source_qc_flag", "source_use_flag", "qc_reason"))
@@ -80,9 +85,14 @@ def run() -> pd.DataFrame:
         compare(f"P6 {table}", ROOT / f"data/bi_handoff/{table}.parquet", REPLAY / f"bi_handoff/{table}.parquet",
                 key, numeric, categorical, 1e-9)
     result = pd.DataFrame(RESULTS)
-    result.to_csv(ROOT / "reports/p7_replay/comparison.csv", index=False)
+    comparison_path.parent.mkdir(parents=True, exist_ok=True)
+    result.to_csv(comparison_path, index=False)
     return result
 
 
 if __name__ == "__main__":
-    print(run().to_string(index=False))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--replay-root", type=Path, default=REPLAY)
+    parser.add_argument("--comparison-path", type=Path, default=ROOT / "reports/p7_replay/comparison.csv")
+    args = parser.parse_args()
+    print(run(args.replay_root, args.comparison_path).to_string(index=False))

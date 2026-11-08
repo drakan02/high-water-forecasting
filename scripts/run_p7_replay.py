@@ -38,7 +38,13 @@ def _run(name: str, args: list[str], env: dict[str, str], records: list[dict]) -
         raise RuntimeError(f"Replay step {name} failed ({result.returncode}); see {log_path}")
 
 
-def run() -> dict:
+def run(replay_root: Path = REPLAY, logs_dir: Path = LOGS,
+        manifest_path: Path = ROOT / "reports/p7_replay/run_manifest.json") -> dict:
+    global REPLAY, CONFIGS, LOGS
+    REPLAY = replay_root if replay_root.is_absolute() else ROOT / replay_root
+    LOGS = logs_dir if logs_dir.is_absolute() else ROOT / logs_dir
+    manifest_path = manifest_path if manifest_path.is_absolute() else ROOT / manifest_path
+    CONFIGS = REPLAY / "configs"
     REPLAY.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
     env.setdefault("UV_CACHE_DIR", "/tmp/uv-cache")
@@ -112,7 +118,7 @@ def run() -> dict:
                        "--p5-root", str(REPLAY / "p5_evaluation"), "--p1-hourly", str(REPLAY / "p1/hourly.parquet"),
                        "--p2-root", str(REPLAY / "p2")], env, records)
     _run("P6_validate", [sys.executable, "-u", "scripts/validate_powerbi_handoff.py", "--bi-root", str(REPLAY / "bi_handoff"),
-                         "--p5-root", str(REPLAY / "p5_evaluation"), "--report-path", str(ROOT / "reports/p7_replay/bi_validation.csv")], env, records)
+                         "--p5-root", str(REPLAY / "p5_evaluation"), "--report-path", str(LOGS.parent / "bi_validation.csv")], env, records)
     _run("P7_tests", [sys.executable, "-u", "-m", "pytest", "-q"], env, records)
 
     raw_path = ROOT / "data/raw/gesla_s3/avonmouth-avo-gbr-bodc.parquet"
@@ -128,9 +134,16 @@ def run() -> dict:
                "python": sys.version, "package_versions": versions, "config_sha256": config_hashes,
                "uv_lock_sha256": hashlib.sha256(lock_path.read_bytes()).hexdigest(),
                "steps": records, "replay_root": str(REPLAY.relative_to(ROOT))}
-    (ROOT / "reports/p7_replay/run_manifest.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     return summary
 
 
 if __name__ == "__main__":
-    print(json.dumps(run(), indent=2))
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--replay-root", type=Path, default=REPLAY)
+    parser.add_argument("--logs-dir", type=Path, default=LOGS)
+    parser.add_argument("--manifest-path", type=Path, default=ROOT / "reports/p7_replay/run_manifest.json")
+    args = parser.parse_args()
+    print(json.dumps(run(args.replay_root, args.logs_dir, args.manifest_path), indent=2))

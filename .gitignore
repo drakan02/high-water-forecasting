@@ -9,6 +9,7 @@ data/raw/**
 !data/raw/**/.gitkeep
 data/clean/**
 data/p7_replay/
+reports/audit/*/replay/data/
 runs/**
 *.env
 .env.*

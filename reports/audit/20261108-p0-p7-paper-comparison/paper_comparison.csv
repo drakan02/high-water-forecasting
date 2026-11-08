@@ -1,0 +1,14 @@
+period,site,study,model,MAE_cm,RMSE_cm,internal_MAE_gain_cm,internal_MAE_gain_pct,direct_delta_vs_paper_cm,comparability
+2007 high waters,Avonmouth,Hibbert 2015,EHM,16.30,19.55,,, ,Paper error is H-S-P; project comparator is gauge-only H-P
+2007 high waters,Avonmouth,Hibbert 2015,ECM,9.05,11.59,7.25,44.4785,,Paper error is H-S-P; project comparator is gauge-only H-P
+2007 high waters,Avonmouth,Project chronological test,Harmonic baseline,25.3412,31.8247,,, ,UTide gauge-only total-H target; not EHM
+2007 high waters,Avonmouth,Project chronological test,Gauge-only ECM,16.2892,22.2337,9.0520,35.7206,,Same 701 paired peaks within project; no surge correction
+2007 high waters,Avonmouth,Project retrospective in-sample,Harmonic baseline,25.2089,31.6175,,, ,UTide fit includes 2007; descriptive only, not backtest
+2007 high waters,Avonmouth,Project retrospective in-sample,Gauge-only ECM,16.2828,21.8198,8.9261,35.4084,,Same 701 paired peaks within project; in-sample
+2006-2009 high waters,Avonmouth,Hibbert 2015,EHM,14.37,17.80,,, ,Paper error is H-S-P; project comparator is gauge-only H-P
+2006-2009 high waters,Avonmouth,Hibbert 2015,ECM,8.94,11.61,5.43,37.7871,,Paper error is H-S-P; project comparator is gauge-only H-P
+2006-2009 high waters,Newport,Hibbert 2015,EHM,15.83,19.26,,, ,Paper reference only; project did not run Newport
+2006-2009 high waters,Newport,Hibbert 2015,ECM,9.71,12.89,6.12,38.6608,,Paper reference only; project did not run Newport
+2010 test,Avonmouth,Hibbert 2015,All methods,not reported,not reported,, , ,Paper says errors reduced similarly across 42 sites; no Avonmouth-specific table metric
+2010 test,Avonmouth,Project transfer,Harmonic baseline,21.8626,27.3733,,, ,UTide gauge-only total-H target; not EHM
+2010 test,Avonmouth,Project transfer,Gauge-only ECM,14.6339,18.7231,7.2287,33.0643,,Same 645 paired peaks within project; no surge correction

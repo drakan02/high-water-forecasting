@@ -1,0 +1,7 @@
+slice,design_id,split,model,n_unique_cycles,detail_rows,MAE_cm,RMSE_cm,bias_cm
+all_2007_test,chronological_fit_through_2004,test_2007,gauge_only_ecm,701,701,16.28916816382648,22.233675823184857,1.9762115629964183
+all_2007_test,chronological_fit_through_2004,test_2007,harmonic_baseline,701,701,25.341212885986053,31.82465384277508,10.985996898425345
+jan_2007,chronological_fit_through_2004,test_2007,gauge_only_ecm,60,60,27.77862644308119,38.59726535017665,6.052614867120881
+jan_2007,chronological_fit_through_2004,test_2007,harmonic_baseline,60,60,34.67282847231641,42.499187468182654,19.39681019836659
+single_peak_avonmouth:chronological_fit_through_2004:20061231T2300Z,chronological_fit_through_2004,test_2007,gauge_only_ecm,1,1,4.6648985652218755,4.6648985652218755,4.6648985652218755
+single_peak_avonmouth:chronological_fit_through_2004:20061231T2300Z,chronological_fit_through_2004,test_2007,harmonic_baseline,1,1,2.070128190255005,2.070128190255005,2.070128190255005

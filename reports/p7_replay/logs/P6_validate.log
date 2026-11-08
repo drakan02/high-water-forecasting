@@ -1,0 +1,14 @@
+                                                               slice                             design_id                        split         model_key  paired_cycle_count  fact_rows    MAE_cm   RMSE_cm
+                                                          all_paired avonmouth_transfer_2010_fit_1990_2009                    test_2010    gauge_only_ecm                 645        645 14.633887 18.723146
+                                                          all_paired avonmouth_transfer_2010_fit_1990_2009                    test_2010 harmonic_baseline                 645        645 21.862615 27.373259
+                                                          all_paired        chronological_fit_through_2004                    test_2007    gauge_only_ecm                 701        701 16.289168 22.233676
+                                                          all_paired        chronological_fit_through_2004                    test_2007 harmonic_baseline                 701        701 25.341213 31.824654
+                                                          all_paired        chronological_fit_through_2004              validation_2006    gauge_only_ecm                 650        650 15.828488 21.501463
+                                                          all_paired        chronological_fit_through_2004              validation_2006 harmonic_baseline                 650        650 23.916543 31.026217
+                                                          all_paired               retrospective_1988_2007 retrospective_in_sample_2007    gauge_only_ecm                 701        701 16.282809 21.819791
+                                                          all_paired               retrospective_1988_2007 retrospective_in_sample_2007 harmonic_baseline                 701        701 25.208873 31.617529
+                                     chronological_test_2007_january        chronological_fit_through_2004                    test_2007    gauge_only_ecm                  60         60 27.778626 38.597265
+                                     chronological_test_2007_january        chronological_fit_through_2004                    test_2007 harmonic_baseline                  60         60 34.672828 42.499187
+single_cycle_avonmouth:chronological_fit_through_2004:20061231T2300Z        chronological_fit_through_2004                    test_2007    gauge_only_ecm                   1          1  4.664899  4.664899
+single_cycle_avonmouth:chronological_fit_through_2004:20061231T2300Z        chronological_fit_through_2004                    test_2007 harmonic_baseline                   1          1  2.070128  2.070128
+Validated all-paired, January 2007, and single-cycle slices; wrote reports/p7_replay/bi_validation.csv

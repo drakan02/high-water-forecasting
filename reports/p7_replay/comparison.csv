@@ -1,0 +1,16 @@
+artifact,rows,key,max_abs_numeric_diff,tolerance,status
+P1 hourly,8760,time_utc,0.0,1e-10,PASS
+P2 hourly chronological_fit_through_2004,8760,time_utc,0.0,1e-10,PASS
+P2 coefficients chronological_fit_through_2004,68,constituent,0.0,1e-09,PASS
+P3 cycles chronological_fit_through_2004,3529,cycle_id,0.0,1e-10,PASS
+P4 forecasts chronological_fit_through_2004,1410,cycle_id,0.0,1e-10,PASS
+P2 hourly retrospective_1988_2007,8760,time_utc,0.0,1e-10,PASS
+P2 coefficients retrospective_1988_2007,68,constituent,0.0,1e-09,PASS
+P3 cycles retrospective_1988_2007,3529,cycle_id,0.0,1e-10,PASS
+P4 forecasts retrospective_1988_2007,705,cycle_id,0.0,1e-10,PASS
+P5 transfer labels,705,cycle_id,0.0,1e-10,PASS
+P5 transfer forecasts,705,cycle_id,0.0,1e-10,PASS
+P5 paired metrics,8,design_id,0.0,1e-06,PASS
+P6 FactForecast,5640,fact_forecast_key,0.0,1e-09,PASS
+P6 FactQuality,8760,fact_quality_key,0.0,1e-09,PASS
+P6 FactSpectrum,338,spectrum_key,0.0,1e-09,PASS

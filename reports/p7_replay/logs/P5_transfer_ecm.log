@@ -1,0 +1,30 @@
+{
+  "designs": [
+    {
+      "design_id": "avonmouth_transfer_2010_fit_1990_2009",
+      "mode": "frozen_transfer",
+      "fit_year": 2009,
+      "fit_rows": 684,
+      "design_matrix_rank": 4,
+      "design_matrix_columns": 4,
+      "coefficients": {
+        "C1": 0.8710801606386173,
+        "C2": -0.21612461253931436,
+        "C3": -0.12931030395439846,
+        "C4_intercept_m": 0.028715099882057143
+      },
+      "issue_lead_hours": 24.0,
+      "forecast_rows": 705,
+      "forecastable_rows": 657,
+      "excluded_rows": 48,
+      "model_sha256": "9c04c79652b43e5be0e9715d4d36990f3670d15bf3e81a05cface729fb6a48a7",
+      "model_path": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p5_transfer/ecm/avonmouth_transfer_2010_fit_1990_2009/ecm_model.json",
+      "fit_rows_path": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p5_transfer/ecm/avonmouth_transfer_2010_fit_1990_2009/ecm_fit_rows.csv",
+      "forecast_path": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p5_transfer/ecm/avonmouth_transfer_2010_fit_1990_2009/forecasts_unscored.parquet",
+      "forecast_csv_path": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p5_transfer/ecm/avonmouth_transfer_2010_fit_1990_2009/forecasts_unscored.csv",
+      "prediction_exclusions_path": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p5_transfer/ecm/avonmouth_transfer_2010_fit_1990_2009/prediction_exclusions.csv",
+      "surge_status": "unavailable; gauge-only correction predicts total H_N and is not Table 1b-comparable"
+    }
+  ],
+  "summary": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p5_transfer/ecm/p4_run_summary.json"
+}

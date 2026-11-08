@@ -1,0 +1,220 @@
+{
+  "raw_source": "data/raw/gesla_s3/avonmouth-avo-gbr-bodc.parquet",
+  "raw_sha256": "7a796fcb64215becd2fb429b75a48be5afcb392c613a7f54e509c36250e71bb8",
+  "python": "3.11.15 (main, May 10 2026, 19:28:18) [Clang 22.1.3 ]",
+  "package_versions": {
+    "numpy": "2.4.6",
+    "pandas": "3.1.1",
+    "scipy": "1.17.1",
+    "UTide": "0.4.0",
+    "pyarrow": "26.0.1",
+    "matplotlib": "3.11.2",
+    "pytest": "9.2.0"
+  },
+  "config_sha256": {
+    "configs/avonmouth.yaml": "3ae447875dbbe38f52c048f3539165b9e5d2e4e49936315d2cae8e3becba4fc9",
+    "configs/p2_gauge_only_chronological.yaml": "42028e73f8b195976c21e262aae8b0010ebc96a72f410b21118e0d4ab0e5447a",
+    "configs/p2_gauge_only_retrospective.yaml": "42dea9f9a996cd23b2a8c1a1afd1c972ba1e22fdc44b821fc74f6672856377e2",
+    "configs/p3_peaks.yaml": "2420ab14d4afaf2809c165c6e14e0029957bad0c2ae7ab8a34467ec977557484",
+    "configs/p4_ecm_gauge_only.yaml": "8acdc5536a8bb80ae346367416a8f9477bb1f8d6122a1e65d57130b478822319",
+    "configs/p5_evaluation.yaml": "cba9c39b489c86823c0b485062a9696cc5d1e31bb67438c72fbdb4be40a91e1d",
+    "configs/p5_transfer_2010.yaml": "22bebcf4901d354241e1ccd12cba01c158cbfc7bfd266f15d24c071728e32927",
+    "configs/p5_transfer_2010_ecm.yaml": "4f284ac3d1fc03a2d3bea214c59380d513af78b37065aa6752d4d695d559f1aa"
+  },
+  "uv_lock_sha256": "bc11ce1ce7a28d43a3005ee5b4b04efa2369701dc4fcbe3a47c38ceaadd7889c",
+  "steps": [
+    {
+      "step": "P1_ingest",
+      "command": [
+        "/home/khang/Code/data-pipeline/high-water-forecasting/.venv/bin/python3",
+        "-u",
+        "-m",
+        "tide",
+        "ingest",
+        "--config",
+        "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/configs/avonmouth.yaml"
+      ],
+      "return_code": 0,
+      "elapsed_seconds": 1.705,
+      "log": "reports/p7_replay/logs/P1_ingest.log",
+      "log_sha256": "f3868647ed62bfc6d00848a4a28f05abca2bad143abc2d0c031dea191d68b0f1"
+    },
+    {
+      "step": "P1_prepare",
+      "command": [
+        "/home/khang/Code/data-pipeline/high-water-forecasting/.venv/bin/python3",
+        "-u",
+        "-m",
+        "tide",
+        "prepare",
+        "--config",
+        "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/configs/avonmouth.yaml"
+      ],
+      "return_code": 0,
+      "elapsed_seconds": 2.421,
+      "log": "reports/p7_replay/logs/P1_prepare.log",
+      "log_sha256": "d09ad37b9ffdba0d1f86d1f28d29972edc5a0449d14426494be11c29c161d52b"
+    },
+    {
+      "step": "P2_chronological_fit_through_2004",
+      "command": [
+        "/home/khang/Code/data-pipeline/high-water-forecasting/.venv/bin/python3",
+        "-u",
+        "scripts/run_harmonic_guarded.py",
+        "--config",
+        "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/configs/chronological_fit_through_2004.yaml"
+      ],
+      "return_code": 0,
+      "elapsed_seconds": 7.852,
+      "log": "reports/p7_replay/logs/P2_chronological_fit_through_2004.log",
+      "log_sha256": "c5f1e279bb35ce5d645513e9848e9e92113989f3180ae58171e95b3775fffa6d"
+    },
+    {
+      "step": "P2_retrospective_1988_2007",
+      "command": [
+        "/home/khang/Code/data-pipeline/high-water-forecasting/.venv/bin/python3",
+        "-u",
+        "scripts/run_harmonic_guarded.py",
+        "--config",
+        "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/configs/retrospective_1988_2007.yaml"
+      ],
+      "return_code": 0,
+      "elapsed_seconds": 8.589,
+      "log": "reports/p7_replay/logs/P2_retrospective_1988_2007.log",
+      "log_sha256": "21e180ba67b8509f4b9a43e0099f9c1c139586737f4ad2275760f5a38c5e349c"
+    },
+    {
+      "step": "P3_peaks",
+      "command": [
+        "/home/khang/Code/data-pipeline/high-water-forecasting/.venv/bin/python3",
+        "-u",
+        "-m",
+        "tide",
+        "peaks",
+        "--config",
+        "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/configs/p3_peaks.yaml"
+      ],
+      "return_code": 0,
+      "elapsed_seconds": 7.352,
+      "log": "reports/p7_replay/logs/P3_peaks.log",
+      "log_sha256": "092e25a130147ec10b3abb34f34f461bc1c4d2cd0503b0d018a25d4898f37dee"
+    },
+    {
+      "step": "P4_ecm",
+      "command": [
+        "/home/khang/Code/data-pipeline/high-water-forecasting/.venv/bin/python3",
+        "-u",
+        "-m",
+        "tide",
+        "ecm",
+        "--config",
+        "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/configs/p4_ecm.yaml"
+      ],
+      "return_code": 0,
+      "elapsed_seconds": 5.365,
+      "log": "reports/p7_replay/logs/P4_ecm.log",
+      "log_sha256": "0512b0cd9a2fe27f79d0417ddf4f5a3d1419e05c699850c19c6a40502b30ee24"
+    },
+    {
+      "step": "P5_transfer_2010",
+      "command": [
+        "/home/khang/Code/data-pipeline/high-water-forecasting/.venv/bin/python3",
+        "-u",
+        "scripts/run_harmonic_guarded.py",
+        "--tide-command",
+        "transfer-2010",
+        "--config",
+        "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/configs/p5_transfer_2010.yaml"
+      ],
+      "return_code": 0,
+      "elapsed_seconds": 10.217,
+      "log": "reports/p7_replay/logs/P5_transfer_2010.log",
+      "log_sha256": "0a9d2f5470140e3568b8791dde7c7ef63aef87d7e0265eeac8c4889d5e7f9275"
+    },
+    {
+      "step": "P5_transfer_ecm",
+      "command": [
+        "/home/khang/Code/data-pipeline/high-water-forecasting/.venv/bin/python3",
+        "-u",
+        "-m",
+        "tide",
+        "ecm",
+        "--config",
+        "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/configs/p5_transfer_2010_ecm.yaml"
+      ],
+      "return_code": 0,
+      "elapsed_seconds": 3.187,
+      "log": "reports/p7_replay/logs/P5_transfer_ecm.log",
+      "log_sha256": "3f30ce2b5a040045f93318244ad167871720447bb90231066319c27079b2febe"
+    },
+    {
+      "step": "P5_evaluate",
+      "command": [
+        "/home/khang/Code/data-pipeline/high-water-forecasting/.venv/bin/python3",
+        "-u",
+        "-m",
+        "tide",
+        "evaluate",
+        "--config",
+        "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/configs/p5_evaluation.yaml"
+      ],
+      "return_code": 0,
+      "elapsed_seconds": 2.617,
+      "log": "reports/p7_replay/logs/P5_evaluate.log",
+      "log_sha256": "f64758e1d8858624347b2a98d5fbf84f719059dc5bbc327f0835768cb908c657"
+    },
+    {
+      "step": "P6_build",
+      "command": [
+        "/home/khang/Code/data-pipeline/high-water-forecasting/.venv/bin/python3",
+        "-u",
+        "scripts/build_powerbi_handoff.py",
+        "--output-dir",
+        "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/bi_handoff",
+        "--p5-root",
+        "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p5_evaluation",
+        "--p1-hourly",
+        "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p1/hourly.parquet",
+        "--p2-root",
+        "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p2"
+      ],
+      "return_code": 0,
+      "elapsed_seconds": 1.659,
+      "log": "reports/p7_replay/logs/P6_build.log",
+      "log_sha256": "4dd28605ec1837a0fa51c72f0cae9e0b4eb6fd0999622d6157e1eaeb54050508"
+    },
+    {
+      "step": "P6_validate",
+      "command": [
+        "/home/khang/Code/data-pipeline/high-water-forecasting/.venv/bin/python3",
+        "-u",
+        "scripts/validate_powerbi_handoff.py",
+        "--bi-root",
+        "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/bi_handoff",
+        "--p5-root",
+        "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p5_evaluation",
+        "--report-path",
+        "/home/khang/Code/data-pipeline/high-water-forecasting/reports/p7_replay/bi_validation.csv"
+      ],
+      "return_code": 0,
+      "elapsed_seconds": 0.449,
+      "log": "reports/p7_replay/logs/P6_validate.log",
+      "log_sha256": "779b65cae62029faaf1e8abb5f34a9f2d3a3f5fd9f89272a726c1fe77808543d"
+    },
+    {
+      "step": "P7_tests",
+      "command": [
+        "/home/khang/Code/data-pipeline/high-water-forecasting/.venv/bin/python3",
+        "-u",
+        "-m",
+        "pytest",
+        "-q"
+      ],
+      "return_code": 0,
+      "elapsed_seconds": 2.274,
+      "log": "reports/p7_replay/logs/P7_tests.log",
+      "log_sha256": "70f55a9abeaf91d258d3ea7a296fe81b4d27797229ca69b7074984c09d15694a"
+    }
+  ],
+  "replay_root": "data/p7_replay"
+}

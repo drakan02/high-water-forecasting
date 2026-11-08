@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import argparse
 import json
 from pathlib import Path
 
@@ -17,14 +18,17 @@ DESIGNS = [
 ]
 
 
-def _write_table(name: str, frame: pd.DataFrame) -> None:
-    frame.to_csv(OUT / f"{name}.csv", index=False)
-    frame.to_parquet(OUT / f"{name}.parquet", index=False)
+def _write_table(name: str, frame: pd.DataFrame, output_dir: Path) -> None:
+    frame.to_csv(output_dir / f"{name}.csv", index=False)
+    frame.to_parquet(output_dir / f"{name}.parquet", index=False)
 
 
-def build() -> dict[str, object]:
-    OUT.mkdir(parents=True, exist_ok=True)
-    score_root = ROOT / "data/clean/p5_gauge_only_evaluation"
+def build(output_dir: Path = OUT, p5_root: Path | None = None, p1_hourly: Path | None = None, p2_root: Path | None = None) -> dict[str, object]:
+    output_dir = output_dir if output_dir.is_absolute() else ROOT / output_dir
+    score_root = p5_root or ROOT / "data/clean/p5_gauge_only_evaluation"
+    hourly_path = p1_hourly or ROOT / "data/clean/avonmouth_2007_gesla_gauge_only/hourly.parquet"
+    harmonic_root = p2_root or ROOT / "data/clean/p2_gauge_only"
+    output_dir.mkdir(parents=True, exist_ok=True)
     forecast_wide = pd.concat(
         [pd.read_parquet(score_root / d / "scored_high_water.parquet") for d in DESIGNS],
         ignore_index=True,
@@ -69,9 +73,8 @@ def build() -> dict[str, object]:
         lambda r: hashlib.sha256(f"{r.design_id}|{r.cycle_id}|{r.model_key}".encode()).hexdigest()[:20], axis=1
     )
 
-    hourly_path = ROOT / "data/clean/avonmouth_2007_gesla_gauge_only/hourly.parquet"
     hourly = pd.read_parquet(hourly_path)
-    harmonic = pd.read_parquet(ROOT / "data/clean/p2_gauge_only/chronological_fit_through_2004/harmonic_hourly.parquet")
+    harmonic = pd.read_parquet(harmonic_root / "chronological_fit_through_2004/harmonic_hourly.parquet")
     quality = hourly.merge(harmonic[["time_utc", "A_m", "residual_m", "model_id", "design_id"]], on="time_utc", how="left", validate="one_to_one")
     fact_quality = quality.rename(columns={
         "time_utc": "time_utc", "level_m_raw": "H_raw_m", "level_m": "H_hourly_m",
@@ -87,7 +90,7 @@ def build() -> dict[str, object]:
 
     spectrum_parts = []
     for design in DESIGNS[:2]:
-        p = ROOT / f"data/clean/p2_gauge_only/{design}/residual_welch_spectrum.csv"
+        p = harmonic_root / design / "residual_welch_spectrum.csv"
         part = pd.read_csv(p)
         part["station_key"] = "avonmouth"
         part["model_key"] = "harmonic_baseline"
@@ -131,7 +134,7 @@ def build() -> dict[str, object]:
     for name, frame in (("DimStation", dim_station), ("DimDate", dim_date), ("DimModel", dim_model),
                         ("DimRun", dim_run), ("FactForecast", fact_forecast),
                         ("FactQuality", fact_quality), ("FactSpectrum", fact_spectrum)):
-        _write_table(name, frame)
+        _write_table(name, frame, output_dir)
 
     # Filtered expected metrics for the documented overall, month and single-cycle slices.
     checks = []
@@ -148,8 +151,8 @@ def build() -> dict[str, object]:
                            "paired_cycle_count": group.cycle_id.nunique(), "fact_rows": len(group),
                            "MAE_cm": float(err.abs().mean()), "RMSE_cm": float(np.sqrt(np.square(err).mean()))})
     validation = pd.DataFrame(checks)
-    validation.to_csv(OUT / "expected_slice_metrics.csv", index=False)
-    validation.to_parquet(OUT / "expected_slice_metrics.parquet", index=False)
+    validation.to_csv(output_dir / "expected_slice_metrics.csv", index=False)
+    validation.to_parquet(output_dir / "expected_slice_metrics.parquet", index=False)
     summary = {"tables": {}, "ui_status": "UI_PENDING; no Power BI Desktop available in this Linux environment",
                "validation_slices": ["all pilot by run/model", "chronological test January 2007", f"single cycle {first_cycle}"],
                "paired_policy": "Both model rows share the same cycle eligibility; each measure filters paired_eligible and report page must select one run/target.",
@@ -231,9 +234,15 @@ def build() -> dict[str, object]:
             dictionary_rows.append({"table": table, "column": column, "dtype": str(frame[column].dtype), "unit": unit,
                                    "key_role": key_role, "description": descriptions.get(column, f"Exported {column} field from {table}.")})
     pd.DataFrame(dictionary_rows).to_csv(ROOT / "reports/powerbi/data_dictionary.csv", index=False)
-    (OUT / "manifest.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    (output_dir / "manifest.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     return summary
 
 
 if __name__ == "__main__":
-    print(json.dumps(build(), indent=2))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output-dir", type=Path, default=OUT)
+    parser.add_argument("--p5-root", type=Path)
+    parser.add_argument("--p1-hourly", type=Path)
+    parser.add_argument("--p2-root", type=Path)
+    args = parser.parse_args()
+    print(json.dumps(build(args.output_dir, args.p5_root, args.p1_hourly, args.p2_root), indent=2))

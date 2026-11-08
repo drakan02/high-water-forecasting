@@ -1,0 +1,17 @@
+{
+  "expected_hourly_timestamps": 8760,
+  "minute_00_timestamps_present": 8760,
+  "valid_hourly_observations": 8759,
+  "excluded_or_missing_hourly_slots": 1,
+  "source_rows_for_year": 35040,
+  "source_valid_rows_for_year": 35030,
+  "source_interpolated_rows_for_year": 10,
+  "source_rows_for_year_expected": 35040,
+  "source_rows_for_year_present": 35040,
+  "source_year_qc1_count": 35030,
+  "source_year_qc2_interpolated_count": 10,
+  "hourly_parquet": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p1/hourly.parquet",
+  "monthly_qc_csv": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p1/qc_by_station_month.csv",
+  "manifest_csv": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p1/raw_manifest.csv",
+  "figure": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p1/first_14_days.png"
+}

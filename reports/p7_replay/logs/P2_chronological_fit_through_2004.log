@@ -1,0 +1,13 @@
+{
+  "design_id": "chronological_fit_through_2004",
+  "model_id": "UTide-0.4.0",
+  "fit_valid_observations": 123271,
+  "fit_constituents": 68,
+  "hourly_rows": 8760,
+  "hourly_H_valid": 8759,
+  "hourly_A_valid": 8760,
+  "hourly_residual_valid": 8759,
+  "spectrum_hours": 8511,
+  "outputs": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p2/chronological_fit_through_2004"
+}
+PROCESS_EXIT code=0 elapsed=7.8s peak_rss=1.64GiB log=/home/khang/Code/data-pipeline/high-water-forecasting/reports/chronological_fit_through_2004_guarded.log

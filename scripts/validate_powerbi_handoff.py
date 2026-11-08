@@ -1,6 +1,7 @@
 """Check Power BI exports against P5 scored outputs for three required slices."""
 from __future__ import annotations
 
+import argparse
 from pathlib import Path
 
 import numpy as np
@@ -23,16 +24,16 @@ def _metric_rows(rows: pd.DataFrame, slice_name: str) -> list[dict[str, object]]
     return output
 
 
-def validate() -> pd.DataFrame:
-    forecast = pd.read_parquet(BI / "FactForecast.parquet")
+def validate(bi_root: Path = BI, p5_root: Path = P5) -> pd.DataFrame:
+    forecast = pd.read_parquet(bi_root / "FactForecast.parquet")
     assert forecast.fact_forecast_key.is_unique
-    assert pd.read_parquet(BI / "DimStation.parquet").station_key.is_unique
-    assert pd.read_parquet(BI / "DimDate.parquet").date_key.is_unique
-    assert pd.read_parquet(BI / "DimModel.parquet").model_key.is_unique
-    assert pd.read_parquet(BI / "DimRun.parquet").run_key.is_unique
+    assert pd.read_parquet(bi_root / "DimStation.parquet").station_key.is_unique
+    assert pd.read_parquet(bi_root / "DimDate.parquet").date_key.is_unique
+    assert pd.read_parquet(bi_root / "DimModel.parquet").model_key.is_unique
+    assert pd.read_parquet(bi_root / "DimRun.parquet").run_key.is_unique
     assert forecast.station_key.eq("avonmouth").all()
-    assert forecast.design_id.isin(pd.read_parquet(BI / "DimRun.parquet").run_key).all()
-    assert forecast.model_key.isin(pd.read_parquet(BI / "DimModel.parquet").model_key).all()
+    assert forecast.design_id.isin(pd.read_parquet(bi_root / "DimRun.parquet").run_key).all()
+    assert forecast.model_key.isin(pd.read_parquet(bi_root / "DimModel.parquet").model_key).all()
     assert forecast.surge_m.isna().all()
 
     paired = forecast[forecast.paired_eligible & forecast.error_cm.notna()]
@@ -51,7 +52,7 @@ def validate() -> pd.DataFrame:
     cycle_id = january.cycle_id.iloc[0]
     actual.extend(_metric_rows(january[january.cycle_id == cycle_id], f"single_cycle_{cycle_id}"))
     actual_frame = pd.DataFrame(actual).sort_values(["slice", "design_id", "split", "model_key"]).reset_index(drop=True)
-    expected = pd.read_parquet(BI / "expected_slice_metrics.parquet").sort_values(
+    expected = pd.read_parquet(bi_root / "expected_slice_metrics.parquet").sort_values(
         ["slice", "design_id", "split", "model_key"]
     ).reset_index(drop=True)
     assert actual_frame[["slice", "design_id", "split", "model_key", "paired_cycle_count", "fact_rows"]].equals(
@@ -60,7 +61,7 @@ def validate() -> pd.DataFrame:
     for metric in ("MAE_cm", "RMSE_cm"):
         assert np.allclose(actual_frame[metric], expected[metric], rtol=0, atol=1e-10)
 
-    p5_metrics = pd.read_csv(P5 / "paired_metrics.csv")
+    p5_metrics = pd.read_csv(p5_root / "paired_metrics.csv")
     for _, row in p5_metrics.iterrows():
         model_key = "harmonic_baseline" if row.model == "harmonic_baseline" else "gauge_only_ecm"
         detail = paired[(paired.design_id == row.design_id) & (paired.split == row.split) & (paired.model_key == model_key)]
@@ -71,8 +72,14 @@ def validate() -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    results = validate()
-    path = ROOT / "reports/powerbi/validation_results.csv"
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--bi-root", type=Path, default=BI)
+    parser.add_argument("--p5-root", type=Path, default=P5)
+    parser.add_argument("--report-path", type=Path, default=ROOT / "reports/powerbi/validation_results.csv")
+    args = parser.parse_args()
+    results = validate(args.bi_root, args.p5_root)
+    path = args.report_path
+    path.parent.mkdir(parents=True, exist_ok=True)
     results.to_csv(path, index=False)
     print(results.to_string(index=False))
     print(f"Validated all-paired, January 2007, and single-cycle slices; wrote {path.relative_to(ROOT)}")

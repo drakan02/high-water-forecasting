@@ -8,6 +8,7 @@ __pycache__/
 data/raw/**
 !data/raw/**/.gitkeep
 data/clean/**
+data/p7_replay/
 runs/**
 *.env
 .env.*

@@ -1,0 +1,55 @@
+{
+  "designs": [
+    {
+      "design_id": "chronological_fit_through_2004",
+      "mode": "chronological",
+      "fit_year": 2005,
+      "fit_rows": 636,
+      "design_matrix_rank": 4,
+      "design_matrix_columns": 4,
+      "coefficients": {
+        "C1": 0.9295371254016086,
+        "C2": -0.32069533899756003,
+        "C3": -0.12668350579508147,
+        "C4_intercept_m": 0.03643873019341162
+      },
+      "issue_lead_hours": 24.0,
+      "forecast_rows": 1410,
+      "forecastable_rows": 1359,
+      "excluded_rows": 51,
+      "model_sha256": "46b7c12042aa327cc4a8811edd515f049d41b574248c012de74ab5968c293306",
+      "model_path": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p4/chronological_fit_through_2004/ecm_model.json",
+      "fit_rows_path": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p4/chronological_fit_through_2004/ecm_fit_rows.csv",
+      "forecast_path": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p4/chronological_fit_through_2004/forecasts_unscored.parquet",
+      "forecast_csv_path": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p4/chronological_fit_through_2004/forecasts_unscored.csv",
+      "prediction_exclusions_path": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p4/chronological_fit_through_2004/prediction_exclusions.csv",
+      "surge_status": "unavailable; gauge-only correction predicts total H_N and is not Table 1b-comparable"
+    },
+    {
+      "design_id": "retrospective_1988_2007",
+      "mode": "retrospective",
+      "fit_year": 2007,
+      "fit_rows": 701,
+      "design_matrix_rank": 4,
+      "design_matrix_columns": 4,
+      "coefficients": {
+        "C1": 0.793127970992072,
+        "C2": -0.20831556666030626,
+        "C3": -0.12252562285651464,
+        "C4_intercept_m": 0.05314390140785033
+      },
+      "issue_lead_hours": 24.0,
+      "forecast_rows": 705,
+      "forecastable_rows": 702,
+      "excluded_rows": 3,
+      "model_sha256": "5860009a0d749943e529b78c27cce357aff4d53cb6e559973c00d7231ae5361b",
+      "model_path": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p4/retrospective_1988_2007/ecm_model.json",
+      "fit_rows_path": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p4/retrospective_1988_2007/ecm_fit_rows.csv",
+      "forecast_path": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p4/retrospective_1988_2007/forecasts_unscored.parquet",
+      "forecast_csv_path": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p4/retrospective_1988_2007/forecasts_unscored.csv",
+      "prediction_exclusions_path": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p4/retrospective_1988_2007/prediction_exclusions.csv",
+      "surge_status": "unavailable; gauge-only correction predicts total H_N and is not Table 1b-comparable"
+    }
+  ],
+  "summary": "/home/khang/Code/data-pipeline/high-water-forecasting/data/p7_replay/p4/p4_run_summary.json"
+}

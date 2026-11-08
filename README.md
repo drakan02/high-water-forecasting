@@ -105,6 +105,17 @@ PYTHONPATH=src UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q
 
 The runner uses one BLAS thread, a 3 GiB process-tree RSS cap, 2.44 GiB minimum host-available memory and a 60-minute per-station timeout. It runs stations sequentially and records configs/logs locally. The downloader verifies the registered SHA-256 and never replaces a mismatched local file. See `reports/acceptance/P12.md` for source coverage, paired metrics, hashes and gate evidence.
 
+## P13: network dashboard and Power BI handoff
+
+`dashboard/index.html` is a self-contained offline dashboard for all 44 ports. It filters by port, period, and model view; shows 2010 QC coverage and MAE by port; and includes high-water forecasts, issue origins, lag traces, and the complete model × port × period × target table. The embedded forecast payload is gzip-compressed. `reports/powerbi/network/` documents the star schema, relationships, measures, and visuals. `scripts/build_network_dashboard.py` generates both the HTML and ignored Power BI CSV tables in `data/bi_handoff_network/`; `scripts/validate_network_dashboard.py` verifies hashes, row counts, unique peak keys, and paired metrics against P12.
+
+```bash
+PYTHONPATH=src .venv/bin/python scripts/build_network_dashboard.py
+PYTHONPATH=src .venv/bin/python scripts/validate_network_dashboard.py
+```
+
+The web dashboard and data handoff are validated. Power BI Desktop refresh, PBIX rendering, and slicer interaction remain `UI_PENDING` because Desktop is unavailable in this Linux environment. The dashboard labels the target as total observed H, gauge-only; it does not claim direct Table 2 reproduction. See `reports/acceptance/P13.md`.
+
 
 ## Newport 2010 network extension
 

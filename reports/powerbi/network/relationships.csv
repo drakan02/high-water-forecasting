@@ -1,0 +1,7 @@
+from_table,from_column,to_table,to_column,cardinality,direction
+DimStation,station_id,FactPeakForecast,station_id,one_to_many,single
+DimStation,station_id,FactPeakMetrics,station_id,one_to_many,single
+DimPeriod,period,FactPeakForecast,period,one_to_many,single
+DimPeriod,period,FactPeakMetrics,period,one_to_many,single
+DimModel,model,FactPeakForecast,model,one_to_many,single
+DimModel,model,FactPeakMetrics,model,one_to_many,single

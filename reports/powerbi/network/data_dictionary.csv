@@ -1,0 +1,21 @@
+table,column,type,description
+DimStation,station_id,text,Unique Hibbert port key used to filter both facts
+DimStation,valid_2010,integer,Minute-00 timestamps passing qc_flag=1 and use_flag=1
+DimStation,present_2010,integer,Minute-00 timestamps present in the source file
+DimStation,expected_2010,integer,Hours in the full UTC calendar year 2010
+DimStation,coverage_pct_2010,decimal,valid_2010 divided by expected_2010 times 100
+DimStation,datum,text,Unknown where GESLA metadata does not define the gauge datum
+DimPeriod,period,text,retrospective_2006_2009 or heldout_2010
+DimPeriod,is_in_sample,boolean,True only for retrospective 2006-2009
+DimModel,model,text,UTide-0.4.0 or ECM-OLS-3lag
+FactPeakForecast,cycle_id,text,High-water cycle key preserved from P12 output
+FactPeakForecast,H_m,decimal,Observed total water level at the high-water event in metres
+FactPeakForecast,prediction_m,decimal,Model high-water forecast in metres
+FactPeakForecast,error_m,decimal,prediction_m minus H_m
+FactPeakForecast,paired_sample,boolean,True when this cycle has an issued ECM forecast and valid target H
+FactPeakForecast,origin_utc,datetime,Configured 24-hour forecast origin; provider latency is unverified
+FactPeakForecast,lag_n2_m,decimal,ECM residual predictor at cycle N-2; null for UTide
+FactPeakForecast,lag_n4_m,decimal,ECM residual predictor at cycle N-4; null for UTide
+FactPeakForecast,lag_n6_m,decimal,ECM residual predictor at cycle N-6; null for UTide
+FactPeakMetrics,comparison_scope,text,paired_with_ecm/utide or harmonic-only for the two paper exclusions
+FactPeakMetrics,paired_cycle_sha256,text,SHA-256 of sorted cycle IDs used for the paired comparison

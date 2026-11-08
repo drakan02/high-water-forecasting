@@ -1,0 +1,32 @@
+Paired Peak N :=
+CALCULATE (
+    DISTINCTCOUNT ( FactPeakForecast[cycle_id] ),
+    FactPeakForecast[paired_sample] = TRUE ()
+)
+
+MAE cm :=
+CALCULATE (
+    AVERAGEX (
+        FILTER ( FactPeakForecast, FactPeakForecast[paired_sample] = TRUE () ),
+        ABS ( FactPeakForecast[error_m] ) * 100
+    )
+)
+
+RMSE cm :=
+CALCULATE (
+    SQRT (
+        AVERAGEX (
+            FILTER ( FactPeakForecast, FactPeakForecast[paired_sample] = TRUE () ),
+            POWER ( FactPeakForecast[error_m] * 100, 2 )
+        )
+    )
+)
+
+QC Coverage % :=
+DIVIDE ( SUM ( DimStation[valid_2010] ), SUM ( DimStation[expected_2010] ) ) * 100
+
+ECM Not Applicable Ports :=
+CALCULATE (
+    DISTINCTCOUNT ( DimStation[station_id] ),
+    DimStation[ecm_status] = "NOT_APPLICABLE_PER_PAPER"
+)

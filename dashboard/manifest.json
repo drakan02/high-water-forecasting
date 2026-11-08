@@ -1,0 +1,35 @@
+{
+  "dashboard": "dashboard/index.html",
+  "dashboard_sha256": "f2c6d58a94dcf077776f764c4735d07b2ba71c8e147865f5abd49c404f6e4958",
+  "dashboard_bytes": 7292392,
+  "sources": {
+    "reports/network_2010/network_metrics_paired.csv": "3a0ff3932607cc2f1f80838eb8f71b8e9c3ed5d9901274fed829725cdc5162b7",
+    "reports/network_2010/gesla_bodc_station_inventory.csv": "af64db53d5652ef9f29502a668c6dd148ace60216f3102d89ffd3b597aeb75c2",
+    "reports/network_2010/station_fit_manifest.csv": "b120e4b0640f4da3d8dc38f6680754e0c9400ff605d7d7e9b4e190b25a2c778c",
+    "reports/network_2010/network_forecasts_paired.parquet": "01126f1852eaf3961d6d4ce9adb6cdfb5fb41e6f71e8f0ee10b5db8f8a21ba1d",
+    "reports/network_2010/run_status.csv": "5e131b672689127ddb501f97a72f90cc9f5dd9b3ba4d05258d135664c3212b2e"
+  },
+  "station_count": 44,
+  "metric_rows": 176,
+  "forecast_rows": 119220,
+  "payload_json_bytes": 32792671,
+  "payload_gzip_base64_bytes": 7272228,
+  "forecast_rows_with_all_three_lags": 113712,
+  "forecast_rows_missing_lag_trace": 0,
+  "models": [
+    "UTide-0.4.0",
+    "ECM-OLS-3lag"
+  ],
+  "periods": [
+    "retrospective_2006_2009",
+    "heldout_2010"
+  ],
+  "target": "total_observed_water_level_gauge_only",
+  "external_assets": 0,
+  "limitations": [
+    "not direct Hibbert Table 2 reproduction",
+    "surge unavailable",
+    "source datum/channel unresolved",
+    "Power BI Desktop UI refresh remains pending"
+  ]
+}

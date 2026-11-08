@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "dashboard_sha256": "f2c6d58a94dcf077776f764c4735d07b2ba71c8e147865f5abd49c404f6e4958",
+  "dashboard_bytes": 7292392,
+  "station_count": 44,
+  "metric_rows": 176,
+  "dashboard_peak_rows": 119220,
+  "powerbi_long_peak_rows": 232932,
+  "paired_metrics_reproduced": {
+    "retrospective_2006_2009": {
+      "n": 91445,
+      "UTide_MAE_cm": 14.148087790966887,
+      "UTide_RMSE_cm": 18.90835102145086,
+      "ECM_MAE_cm": 11.010919658004317,
+      "ECM_RMSE_cm": 15.398405136341248
+    },
+    "heldout_2010": {
+      "n": 22267,
+      "UTide_MAE_cm": 12.70690644218559,
+      "UTide_RMSE_cm": 16.930379087705187,
+      "ECM_MAE_cm": 9.711735808955016,
+      "ECM_RMSE_cm": 13.156395541851316
+    }
+  }
+}

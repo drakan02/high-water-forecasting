@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .codegraph/
+SOP_Tai_lap_Hibbert_2015.md
 
 # Downloaded observations, credentials, and generated run outputs stay local.
 data/raw/**

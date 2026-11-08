@@ -55,3 +55,16 @@ The two P2 fits were run with one BLAS/OpenMP thread under a 3 GiB process-tree 
 ## Phase gate
 
 P2–P7 gauge-only outputs are complete and accepted on their phase branches; P6's data handoff is accepted while its desktop UI evidence is marked `UI_PENDING`. P4/P5 are gauge-only adaptations; they do not establish equivalence with the paper's surge-corrected ECM. Keep the paper-aligned Table 1b path blocked until matched surge and original-source metadata are available. The P2 residual is not a verified surge hindcast. Acceptance details are in `reports/acceptance/`; the Vietnamese handoff and evidence index are under `reports/`.
+
+## Public-source ANN substitute
+
+`phase/ann-avonmouth-public` adds a gauge-only ANN experiment using 2005 training, 2006 validation, 2007 held-out scoring, a chronological UTide fit through 2004, and paired high-water cycle IDs. The target is total observed H. This is not direct reproduction of the paper's MATLAB Bayesian-regularized network or Table 1 metrics. ANN peak RMSE is retained even though it is worse than the paired UTide result. The P8 conclusion on direct Table 1(b) remains unchanged. See `reports/acceptance/P9.md`, the versioned designs in `reports/decisions/`, and the manifest under `data/clean/p9_ann_public_source/`.
+
+To replay the accepted run after the source and P2/P3 artifacts are present locally:
+
+```bash
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=src timeout 240 python -m tide ann --config configs/p9_ann_public_source.yaml
+PYTHONPATH=src python -m pytest -q
+```
+
+The public-source access result remains separate from this experiment. BODC's listing marks Avonmouth 2007 unrestricted, but its anonymous query POST returned HTTP 503; CDS GTSM requires user-side sign-in/terms acceptance, and no GTSM coordinates were verified. Follow `reports/public_source_trial/source_access.md`; do not claim a point has been selected.

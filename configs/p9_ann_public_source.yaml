@@ -1,0 +1,16 @@
+source_file: data/raw/gesla_s3/avonmouth-avo-gbr-bodc.parquet
+utide_state_file: data/clean/ann_public_inputs/utide_chronological_through_2004.json
+p3_peak_file: data/clean/ann_public_inputs/accepted_p3_high_water_2007.parquet
+output_dir: data/clean/p9_ann_public_source
+
+# Locked substitute design: 2005 train, 2006 validation, 2007 test.
+train_year: 2005
+validation_year: 2006
+score_year: 2007
+history_hours: 168
+forecast_lead_hours: 24
+hidden_layers: [24, 6]
+seeds: [42, 43, 44]
+l2_alpha: 0.001
+validation_patience: 6
+max_iterations: 1000

@@ -16,6 +16,7 @@ from .peaks import run_peak_cycles
 from .empirical import run_empirical
 from .evaluate import run_evaluation
 from .transfer import run_transfer_2010
+from .ann import run_ann
 
 
 def ingest(config_path: Path) -> dict[str, object]:
@@ -55,6 +56,8 @@ def main() -> None:
     evaluate_parser.add_argument("--config", type=Path, required=True)
     transfer_parser = subparsers.add_parser("transfer-2010", help="build frozen-through-2009 gauge-only 2010 transfer forecasts")
     transfer_parser.add_argument("--config", type=Path, required=True)
+    ann_parser = subparsers.add_parser("ann", help="fit a registered gauge-only ANN substitute and score hourly/high-water outputs")
+    ann_parser.add_argument("--config", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "ingest":
         result = ingest(args.config)
@@ -71,6 +74,8 @@ def main() -> None:
         result = run_empirical(args.config)
     elif args.command == "evaluate":
         result = run_evaluation(args.config)
+    elif args.command == "ann":
+        result = run_ann(args.config)
     else:
         result = run_transfer_2010(args.config)
     print(json.dumps(result, indent=2, default=str))

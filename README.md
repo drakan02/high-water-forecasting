@@ -2,6 +2,10 @@
 
 Reproducible Avonmouth pilot based on Hibbert et al. (2015). Each phase is isolated on a phase branch; P0–P7 are committed and `main` remains unchanged.
 
+## Public-source objective (decision v1)
+
+The current project objective is to reproduce Hibbert et al. (2015) as far as verifiable public sources permit, with substitute-source experiments labeled separately. The earlier P8 conclusion remains: direct Avonmouth Table 1(b) reproduction is unverified without the matching paper EHM and CS3X inputs. See `reports/decisions/2026-11-09-reproduction-goal-v1.md` and `reports/public_source_trial/source_access.md`.
+
 ## Current status
 
 - **P0 gauge-only source decision: DONE.** A real GESLA S3 Parquet object with BODC Avonmouth lineage is verified. The object release is undeclared; its primary/secondary channel and datum remain unknown. See `reports/acceptance/P0.md` and `reports/access_decision.md`.

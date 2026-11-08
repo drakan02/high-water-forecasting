@@ -1,124 +1,128 @@
-# High Water Forecasting
+# Dự báo đỉnh mực nước biển
 
-Reproducible Avonmouth pilot based on Hibbert et al. (2015). Each phase is isolated on a phase branch; P0–P7 are committed and `main` remains unchanged.
+Dự án này khảo sát cách dự báo các đỉnh triều cao tại cửa sông và cảng biển bằng dữ liệu mực nước quan trắc. Nền tảng phương pháp là bài báo của Hibbert và cộng sự (2015), nhưng kết quả trong repo được chia rõ thành **tái lập theo bài báo**, **thử nghiệm gauge-only bằng nguồn thay thế**, và **phần chưa thể kiểm chứng**.
 
-## Public-source objective (decision v1)
+## Bài toán là gì?
 
-The current project objective is to reproduce Hibbert et al. (2015) as far as verifiable public sources permit, with substitute-source experiments labeled separately. The earlier P8 conclusion remains: direct Avonmouth Table 1(b) reproduction is unverified without the matching paper EHM and CS3X inputs. See `reports/decisions/2026-11-09-reproduction-goal-v1.md` and `reports/public_source_trial/source_access.md`.
+Mực nước tại trạm thủy triều thay đổi theo thời gian. Phần lớn biến động có quy luật do lực hấp dẫn của Mặt Trăng và Mặt Trời; gió và áp suất khí quyển cũng có thể làm mực nước cao hoặc thấp hơn dự đoán thủy triều. Đối với cảng và vùng cửa sông, dự báo sai một đỉnh triều có thể ảnh hưởng đến an toàn hàng hải, vận hành công trình và cảnh báo ngập.
 
-## Current status
+Dự án tập trung vào **dự báo độ cao và sai số của từng đỉnh triều cao**. Câu hỏi phương pháp là: liệu có thể dùng sai số ở một số đỉnh trước đó để hiệu chỉnh dự báo đỉnh tiếp theo không?
 
-- **P0 gauge-only source decision: DONE.** A real GESLA S3 Parquet object with BODC Avonmouth lineage is verified. The object release is undeclared; its primary/secondary channel and datum remain unknown. See `reports/acceptance/P0.md` and `reports/access_decision.md`.
-- **P1 gauge ingestion/QC: DONE for the available gauge-only record.** The raw object has 853,104 rows, 1961-01-01 00:00 through 2012-04-30 23:45 UTC per GESLA convention. For 2007: 35,040/35,040 expected 15-minute rows, 35,030 `qc_flag=1`/`use_flag=1`, and 10 `qc_flag=2`. The hourly grid has 8,760/8,760 minute-00 timestamps and 8,759 valid observations.
-- **P2 gauge-only UTide: DONE.** Chronological fit through 2004 used 123,271 observations; retrospective fit 1988–2007 used 148,551. Each fit used 68 UTide constituents and reconstructed A(t) on all 8,760 hourly timestamps; H and residual are valid at 8,759 hours. Confidence intervals are disabled because P2 does not consume them; a synthetic equivalence test confirms coefficient amplitudes and phases are unchanged. See `reports/p2_resource_run.md`.
-- **P3 gauge-only high-water table: DONE.** Each harmonic design yields 705 2007 semidiurnal cycles; 704 have complete gauge coverage, and one cycle containing the source QC gap is excluded without interpolation. P3 retains 2004–2008 cycles for training lags. See `reports/acceptance/P3.md`.
-- **P4 gauge-only ECM forecasts: DONE.** Chronological OLS trained on 636 eligible 2005 cycles (full rank 4), validated on 2006, then issued 702/705 24-hour 2007 forecasts. A separate 2007 retrospective fit is in-sample. Forecast artifacts do not include target H; see `reports/acceptance/P4.md`.
-- **P5 gauge-only evaluation: DONE.** Paired metrics were recomputed from scored outputs for 2006 validation (n=650), chronological 2007 test (n=701), retrospective in-sample 2007 (n=701), and a frozen-through-2009 transfer test in 2010 (n=645). On the gauge-only test splits, ECM MAE was 16.29 cm (2007) and 14.63 cm (2010); all 16 published-table delta fields remain null because these total-water-level predictions are not comparable with the paper's surge-corrected target. The transfer model uses 1990–2009 UTide and 2009 OLS training. See `reports/acceptance/P5.md`.
-- **P6 Power BI data handoff: DONE; UI_PENDING.** Generated a star schema with DimStation/Date/Model/Run and FactForecast/Quality/Spectrum, parameterized Power Query, guarded DAX metrics, data dictionary, relationships and a four-page visual specification. Validation reproduces all run/model scores, a January 2007 slice (n=60 per model), and one selected peak. Power BI Desktop refresh and slicer interaction remain `UI_PENDING` because this run environment is Linux. See `reports/acceptance/P6.md`.
-- **P7 reproducibility: DONE.** Replayed P1–P6 into a fresh ignored directory from the same raw SHA and locked environment. IDs and counts matched; maximum numeric difference was 0 for harmonic coefficients, hourly series, peak tables, forecasts, Power BI facts and metrics (metric tolerance 1e−6 cm). Full replay suite: 21 passed. See `reports/acceptance/P7.md` and `reports/p7_replay/comparison.csv`.
-- **Direct Table 1b reproduction: BLOCKED separately.** No matching 2007 NOC CS3X residual-surge file or Avonmouth grid mapping. Do not calculate surge as `H-A`; the P2 residual may contain meteorological effects and model error.
+## Hibbert và cộng sự (2015) làm gì?
 
-The source is not the original BODC file. Do not claim the GESLA record is a specific original BODC channel or convert its unspecified datum. The record is suitable for a labeled gauge-only experiment, not direct equivalence to paper EHM or Table 1b.
+Ở dạng khái quát, phương pháp trong bài gồm các bước:
 
-## Source and P1 artifacts
+1. Phân tích chuỗi mực nước để tạo dự báo thủy triều thiên văn, ký hiệu `A`.
+2. Dùng hindcast nước dâng do thời tiết (residual surge), ký hiệu `S`, để ước lượng ảnh hưởng khí tượng.
+3. Tại các đỉnh triều cao, tính phần sai khác còn lại giữa quan trắc và các thành phần đã dự báo. ECM dùng các sai khác ở những đỉnh trước — theo chỉ số `N−2`, `N−4`, `N−6` — để hiệu chỉnh đỉnh dự báo.
+4. So sánh dự báo với quan trắc tại các đỉnh tương ứng và tính MAE, RMSE.
 
-Raw file (kept byte-identical and ignored by Git): `data/raw/gesla_s3/avonmouth-avo-gbr-bodc.parquet`
+Bài báo sử dụng phương pháp điều hòa EHM với 114 thành phần triều và chuỗi surge hindcast CS3X của NTSLF. Với Avonmouth, Bảng 1(b) báo cáo MAE giảm từ **16,30 cm xuống 9,05 cm** và RMSE từ **19,55 cm xuống 11,59 cm** khi áp dụng ECM.
 
-SHA-256: `7a796fcb64215becd2fb429b75a48be5afcb392c613a7f54e509c36250e71bb8`
+## Dự án này đã làm gì?
 
-P1 outputs: `data/clean/avonmouth_2007_gesla_gauge_only/hourly.parquet`, `data/clean/avonmouth_2007_gesla_gauge_only/qc_by_station_month.csv`, `data/clean/avonmouth_2007_gesla_gauge_only/raw_manifest.csv`, and `reports/figures/avonmouth_2007_first_14_days_raw_vs_hourly.png`. The manifest stores source URL/query route, object timestamp, SHA-256, schema, site, coordinates, UTC/unit/datum/channel caveats, QC and use terms. Monthly coverage is computed from file values, not catalog coverage.
+Do chưa có đủ dữ liệu đầu vào giống bài báo, dự án xây dựng một nhánh thử nghiệm **gauge-only** riêng:
 
-## Re-run
+1. Đọc số đo và cờ chất lượng, giữ nguyên đơn vị và loại các mẫu không đạt QC.
+2. Dùng UTide để ước lượng thủy triều thiên văn `A(t)`.
+3. Xác định các chu kỳ và đỉnh triều cao từ chuỗi giờ.
+4. Tạo baseline điều hòa và ECM dùng sai số ở các đỉnh trước `N−2/N−4/N−6`.
+5. Đối chiếu UTide và ECM trên cùng các đỉnh, rồi tính MAE/RMSE theo từng trạm, kỳ và mô hình.
 
-Run at repository root. In this workspace use writable uv and Matplotlib cache paths:
+Trong nhánh gauge-only, phần dư được tính là `H−A`, với `H` là mực nước quan trắc. Phần dư này **không phải surge hindcast đã xác minh**: nó có thể chứa ảnh hưởng thời tiết, sai số điều hòa và các thành phần khác. Vì thế dự án không dùng `H−A` thay cho `S` và không gọi các kết quả gauge-only là tái lập trực tiếp bài báo.
+
+## Dữ liệu và QC
+
+### Nguồn quan trắc
+
+Nguồn chính là các đối tượng Parquet công khai trên GESLA S3, có lineage BODC. Đây là các bản ghi GESLA đã được tập hợp, **không phải bản tải processed nguyên gốc của BODC**. Dữ liệu thô không được đưa lên GitHub; một số tệp nằm local trong `data/raw/` và được ignore. Danh mục nguồn, thời đoạn, tọa độ, cờ QC và SHA-256 nằm trong [`data/source_inventory.csv`](data/source_inventory.csv) và [`reports/network_2010/`](reports/network_2010/).
+
+Với Avonmouth, đối tượng đã kiểm tra có 853.104 dòng, từ 1961-01-01 đến 2012-04-30 theo thời gian UTC, cadence 15 phút và đơn vị mét. Riêng năm 2007 có 35.040 mốc 15 phút kỳ vọng; 35.030 dòng có cờ `qc_flag=1` và `use_flag=1`, còn 10 dòng bị gắn suspect. Sau khi tạo lưới giờ theo quy tắc phút 00 UTC, có 8.760 timestamp và 8.759 giờ hợp lệ. Không nội suy khoảng thiếu.
+
+Trong mở rộng mạng lưới, 46 đối tượng GBR BODC-lineage được kiểm tra: 44 đối tượng ánh xạ một-một đến 44 cảng trong mạng lưới bài báo; Felixstowe và Moray Firth được giữ trong inventory nhưng không tính là cảng trong danh sách đó. Dữ liệu nguồn 15 phút được lọc theo QC rồi lấy các quan trắc đúng phút 00 để tạo lưới giờ. Không ghép hoặc lấy trung bình các kênh.
+
+**Kênh BODC gốc và datum của các đối tượng GESLA chưa xác định được.** Không chuyển đổi mốc cao độ khi chưa có bằng chứng.
+
+### Các kỳ và cách chấm
+
+- **2006–2009 hồi cứu:** mô hình được fit và chấm trên cùng giai đoạn; kết quả này là in-sample, không phải kiểm tra ngoài mẫu.
+- **2010 held-out:** UTide được fit trên dữ liệu đến hết 2009; ECM dùng các đỉnh đủ điều kiện trong 2006–2009 để dự báo năm 2010.
+- Các chỉ số paired của UTide và ECM dùng chung ID đỉnh trong từng phép so sánh. `MAE` là sai số tuyệt đối trung bình; `RMSE` phạt sai số lớn mạnh hơn MAE.
+
+## Kết quả mạng lưới 2010
+
+Trên 42 cảng áp dụng được ECM theo phạm vi bài báo, có **22.267 cặp đỉnh** trong tập held-out 2010:
+
+| Mô hình | MAE | RMSE |
+|---|---:|---:|
+| UTide gauge-only | 12,71 cm | 16,93 cm |
+| ECM gauge-only | 9,71 cm | 13,16 cm |
+
+ECM có MAE thấp hơn UTide tại cả 42 cảng được chấm; ở cấp từng đỉnh, ECM có sai số tuyệt đối thấp hơn tại 14.204/22.267 cặp. Hai cảng Port Ellen và Bournemouth vẫn được giữ trong inventory và kết quả điều hòa, nhưng ECM được ghi `NOT_APPLICABLE_PER_PAPER` do đặc điểm nhiều đỉnh cao/thấp trong ngày.
+
+Các số này là kết quả của **thử nghiệm gauge-only trên dữ liệu GESLA/UTide**, không phải các con số của Bảng 2 Hibbert. Trung bình MAE theo cảng cũng khác với pooled MAE tính trực tiếp từ tất cả các cặp đỉnh; khi đọc Power BI cần xem rõ trường tổng hợp và mẫu số.
+
+## Phần tái lập được và giới hạn
+
+**Đã triển khai trên dữ liệu công khai:** kiểm toán nguồn, ingest/QC, baseline UTide, tạo đỉnh, ECM gauge-only, đánh giá ghép cặp, thử nghiệm ANN và Newlyn, thử nghiệm Newport, mở rộng 44 cảng, dashboard HTML offline và bảng dữ liệu Power BI. Acceptance report theo phase nằm trong [`reports/acceptance/`](reports/acceptance/); ma trận mô hình × cảng × kỳ × target ở [`reports/results/model_port_period_target.csv`](reports/results/model_port_period_target.csv).
+
+**Chưa tái lập trực tiếp Bảng 1(b):** chưa có chuỗi residual surge CS3X phù hợp cho Avonmouth năm 2007 kèm ánh xạ ô lưới đã xác minh. Kênh/datum BODC gốc và tính tương đương giữa UTide với EHM 2015 cũng chưa được xác minh. Vì vậy, số liệu thay thế được gắn nhãn gauge-only/substitute và không so sánh delta trực tiếp với benchmark bài báo.
+
+Các thử nghiệm mở rộng cũng giữ riêng giới hạn phương pháp: ANN không phải mạng Bayesian-regularized MATLAB của bài; chuyển giao Newlyn bằng UTide không phải triển khai SHOM MAS; Newport/mạng lưới là các kết quả gauge-only. Kết quả không bị loại chỉ vì kém hơn baseline.
+
+## Dashboard và Power BI
+
+- [`dashboard/index.html`](dashboard/index.html) là dashboard HTML hoạt động offline, gồm 44 cảng, bộ lọc cảng/kỳ/mô hình, độ phủ QC, metric, dự báo đỉnh và lịch sử độ trễ.
+- Chạy `scripts/build_network_dashboard.py` để dựng dashboard và các bảng CSV nhập Power BI trong `data/bi_handoff_network/`.
+- Chạy `scripts/validate_network_dashboard.py` để kiểm tra hash, schema, số dòng, khóa đỉnh và metric paired.
+- Tài liệu mô hình, quan hệ, measures và gợi ý biểu đồ Power BI ở [`reports/powerbi/network/`](reports/powerbi/network/).
+
+Báo cáo Power BI trên web cần được tạo từ semantic model và các bảng CSV/XLSX. Báo cáo tương tác cuối cùng do người dùng tạo/lưu trong Power BI Service; repo hiện bàn giao dữ liệu và thiết kế, không chứa một tệp PBIX đã kiểm chứng.
+
+## Cấu trúc repo
+
+- `src/tide/`: ingest, QC, harmonic, peak, ECM, evaluation, ANN và chuyển giao trạm.
+- `configs/`: cấu hình khóa cho từng phân tích.
+- `scripts/`: chạy phân tích, xuất dữ liệu và kiểm định dashboard/handoff.
+- `tests/`: kiểm thử thuật toán và quy tắc QC.
+- `data/source_inventory.csv`: danh mục nguồn và checksum.
+- `reports/acceptance/`, `reports/decisions/`: phạm vi, quyết định và bằng chứng theo phase.
+- `reports/network_2010/`: inventory, hệ số, metric và manifest mạng lưới.
+- `data/raw/`, `data/clean/`, `data/bi_handoff_network/`: dữ liệu/đầu ra local được ignore theo chính sách; cần tải hoặc dựng lại trước khi replay tương ứng.
+
+## Cài đặt và kiểm tra
+
+Yêu cầu Python theo `.python-version` và `uv`:
 
 ```bash
 UV_CACHE_DIR=/tmp/uv-cache uv sync --locked
-UV_CACHE_DIR=/tmp/uv-cache MPLCONFIGDIR=/tmp/mpl-cache uv run python -m tide ingest --config configs/avonmouth.yaml
-UV_CACHE_DIR=/tmp/uv-cache MPLCONFIGDIR=/tmp/mpl-cache uv run python -m tide prepare --config configs/avonmouth.yaml
 UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q
-UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/run_harmonic_guarded.py --config configs/p2_gauge_only_chronological.yaml
-UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/run_harmonic_guarded.py --config configs/p2_gauge_only_retrospective.yaml
-UV_CACHE_DIR=/tmp/uv-cache MPLCONFIGDIR=/tmp/mpl-cache uv run python -m tide peaks --config configs/p3_peaks.yaml
-UV_CACHE_DIR=/tmp/uv-cache MPLCONFIGDIR=/tmp/mpl-cache uv run python -m tide ecm --config configs/p4_ecm_gauge_only.yaml
-UV_CACHE_DIR=/tmp/uv-cache MPLCONFIGDIR=/tmp/mpl-cache uv run python scripts/run_harmonic_guarded.py --tide-command transfer-2010 --config configs/p5_transfer_2010.yaml
-UV_CACHE_DIR=/tmp/uv-cache MPLCONFIGDIR=/tmp/mpl-cache uv run python -m tide ecm --config configs/p5_transfer_2010_ecm.yaml
-UV_CACHE_DIR=/tmp/uv-cache MPLCONFIGDIR=/tmp/mpl-cache uv run python -m tide evaluate --config configs/p5_evaluation.yaml
-UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/build_powerbi_handoff.py
-UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/validate_powerbi_handoff.py
-UV_CACHE_DIR=/tmp/uv-cache MPLCONFIGDIR=/tmp/mpl-cache uv run python scripts/run_p7_replay.py
-UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/compare_p7_replay.py
 ```
 
-The two P2 fits were run with one BLAS/OpenMP thread under a 3 GiB process-tree RSS watchdog and a 60-minute deadline. `ingest` validates the configured local source and writes the raw manifest. `prepare` writes the exact-minute-00 hourly Parquet, monthly QC/coverage, manifest and first-14-days plot. The source is not automatically fetched.
-
-## Phase gate
-
-P2–P7 gauge-only outputs are complete and accepted on their phase branches; P6's data handoff is accepted while its desktop UI evidence is marked `UI_PENDING`. P4/P5 are gauge-only adaptations; they do not establish equivalence with the paper's surge-corrected ECM. Keep the paper-aligned Table 1b path blocked until matched surge and original-source metadata are available. The P2 residual is not a verified surge hindcast. Acceptance details are in `reports/acceptance/`; the Vietnamese handoff and evidence index are under `reports/`.
-
-## Public-source ANN substitute
-
-`phase/ann-avonmouth-public` adds a gauge-only ANN experiment using 2005 training, 2006 validation, 2007 held-out scoring, a chronological UTide fit through 2004, and paired high-water cycle IDs. The target is total observed H. This is not direct reproduction of the paper's MATLAB Bayesian-regularized network or Table 1 metrics. ANN peak RMSE is retained even though it is worse than the paired UTide result. The P8 conclusion on direct Table 1(b) remains unchanged. See `reports/acceptance/P9.md`, the versioned designs in `reports/decisions/`, and the manifest under `data/clean/p9_ann_public_source/`.
-
-To replay the accepted run after the source and P2/P3 artifacts are present locally:
-
-```bash
-OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=src timeout 240 python -m tide ann --config configs/p9_ann_public_source.yaml
-PYTHONPATH=src python -m pytest -q
-```
-
-
-## Newlyn species-transfer substitute
-
-`phase/species-concordance-newlyn` acquired the public GESLA S3 Newlyn BODC-lineage file directly (10.4 MB; SHA-256 and source details in `data/source_inventory.csv`). It has Newlyn observations through 2021, while its original BODC channel and datum are unresolved. The reported method is a species-banded complex harmonic-transfer approximation using UTide; the SHOM MAS implementation is unavailable, so this is not exact Species Concordance or direct Table 1 reproduction. It uses the 2006 overlap for calibration and 2007 for held-out scoring, compares on 8,759 hourly observations and the same 704 P3 high-water cycle IDs, and retains both model results even though transferred hourly metrics are worse. Every target is total observed H, gauge-only. See `reports/acceptance/P10.md` and the versioned design decision.
-
-To replay after the ignored Avonmouth/P3 inputs and the Newlyn raw object are available locally:
-
-```bash
-OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=src timeout 300 python -m tide species --config configs/p10_species_newlyn.yaml
-PYTHONPATH=src python -m pytest -q
-```
-
-The raw Newlyn object is available at `https://gesla-dataset.s3.eu-west-1.amazonaws.com/parquet_files/newlyn-new-gbr-bodc.parquet`; the GESLA S3 release number is not encoded in its file metadata. Monthly QC counts, coefficient transfer factors, metric tables and artifact checksums are stored in the ignored local output directory `data/clean/p10_species_newlyn/`.
-
-The source trial for Avonmouth BODC/GTSM remains separate: no original BODC download or GTSM series/point has been validated. The P8 direct Table 1(b) conclusion remains unchanged.
-
-## P12: 44-port network expansion
-
-P12 inspects 46 actual public GESLA S3 BODC-lineage station objects (44 map one-to-one to the Hibbert Table 2 ports; Felixstowe and Moray Firth are retained as non-paper inventory records). It fits UTide 0.4.0 independently for each matched port using exact-minute-00 finite, non-fill observations with `qc_flag=1` and `use_flag=1`, from the later of 1990-01-01 or the source record's first date through 2009. The 2010 frozen transfer uses ECM OLS with N−2/N−4/N−6 lags and a 24-hour issue lead. A second fit scores 2006–2009 retrospectively in-sample. UTide and ECM metrics use identical forecastable peak IDs; the target is total observed water level in metres, not surge. Port Ellen and Bournemouth keep their harmonic outputs and are marked `NOT_APPLICABLE_PER_PAPER` for ECM, matching the article's multiple-high/low-water exclusion.
-
-The 2010 comparison across the 42 ECM-applicable ports has 22,267 paired station-cycle rows: UTide MAE/RMSE 12.71/16.93 cm and ECM 9.71/13.16 cm. The retrospective 2006–2009 comparison has 91,445 paired rows: UTide 14.15/18.91 cm and ECM 11.01/15.40 cm. Candidate UTide intervals vary from 705 to 1,256 per port, with 13 to 701 eligible after the locked duration and QC rules; all counts are reported by port. Bournemouth and Weymouth have unusually high candidate counts and Sheerness has only 13 eligible peaks, so per-port cycle correspondence remains an explicit limitation. These pooled metrics weight each paired peak equally and do not reproduce Hibbert Table 2: the input is GESLA/BODC-lineage, UTide substitutes for EHM, source datum/channel are unresolved, no surge term is used, and the retrospective results are in-sample. The direct Table 1(b) P8 conclusion remains unchanged.
-
-Reviewable artifacts are in `reports/network_2010/`: source inventory and SHA-256 manifest, per-port run status, station fit manifest, 2,991 UTide constituent rows, 84 ECM model coefficient records, 176 model/port/period metric rows, 119,220 paired peak records in Parquet, and scoring manifest. Raw 46-object source Parquet files remain ignored under `data/raw/gesla_s3/` and are not redistributed. The unified project matrix is `reports/results/model_port_period_target.csv`.
-
-Replay from the repository root after installing the locked environment:
-
-```bash
-UV_CACHE_DIR=/tmp/uv-cache uv sync --locked
-UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/download_p12_gesla_bodc.py
-UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/build_p12_network_inventory.py
-OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 MPLCONFIGDIR=/tmp/mpl-cache PYTHONPATH=src UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/run_p12_network_2010.py --config configs/p12_network_2010.yaml
-UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/score_p12_network_2010.py --config configs/p12_network_2010.yaml
-UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/export_p12_models.py --config configs/p12_network_2010.yaml
-PYTHONPATH=src UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q
-```
-
-The runner uses one BLAS thread, a 3 GiB process-tree RSS cap, 2.44 GiB minimum host-available memory and a 60-minute per-station timeout. It runs stations sequentially and records configs/logs locally. The downloader verifies the registered SHA-256 and never replaces a mismatched local file. See `reports/acceptance/P12.md` for source coverage, paired metrics, hashes and gate evidence.
-
-## P13: network dashboard and Power BI handoff
-
-`dashboard/index.html` is a self-contained offline dashboard for all 44 ports. It filters by port, period, and model view; shows 2010 QC coverage and MAE by port; and includes high-water forecasts, issue origins, lag traces, and the complete model × port × period × target table. The embedded forecast payload is gzip-compressed. `reports/powerbi/network/` documents the star schema, relationships, measures, and visuals. `scripts/build_network_dashboard.py` generates both the HTML and ignored Power BI CSV tables in `data/bi_handoff_network/`; `scripts/validate_network_dashboard.py` verifies hashes, row counts, unique peak keys, and paired metrics against P12.
+Để dựng lại dashboard và handoff sau khi các đầu ra P12 đã có local:
 
 ```bash
 PYTHONPATH=src .venv/bin/python scripts/build_network_dashboard.py
 PYTHONPATH=src .venv/bin/python scripts/validate_network_dashboard.py
 ```
 
-The web dashboard and data handoff are validated. Power BI Desktop refresh, PBIX rendering, and slicer interaction remain `UI_PENDING` because Desktop is unavailable in this Linux environment. The dashboard labels the target as total observed H, gauge-only; it does not claim direct Table 2 reproduction. See `reports/acceptance/P13.md`.
+Để tải lại dữ liệu mạng lưới GESLA và chạy lại P12 (có thể mất thời gian, chạy tuần tự theo trạm):
 
+```bash
+UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/download_p12_gesla_bodc.py
+UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/build_p12_network_inventory.py
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 MPLCONFIGDIR=/tmp/mpl-cache PYTHONPATH=src UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/run_p12_network_2010.py --config configs/p12_network_2010.yaml
+UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/score_p12_network_2010.py --config configs/p12_network_2010.yaml
+UV_CACHE_DIR=/tmp/uv-cache uv run python scripts/export_p12_models.py --config configs/p12_network_2010.yaml
+UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q
+```
 
-## Newport 2010 network extension
+Lệnh chạy riêng cho Avonmouth và các thử nghiệm ANN/Newlyn/Newport được mô tả trong acceptance report và `NEXT_ACTION.md`. Một số bước cần dữ liệu nguồn local trước khi chạy.
 
-P11 acquired the UK Newport GESLA S3 object `newport-npo-gbr-bodc.parquet` (6,038,181 bytes; SHA-256 `6b3addc9c07f6e19f1ad07cc83a3cfeded96073c1e9a95e41cbbab3b7fedb6b9`). Analysis uses exact minute-00 records passing GESLA `use_flag=1` and `qc_flag=1`; source unit is metres, while original BODC channel/datum and exact GESLA release remain unresolved. UTide fits 1993–2009, then an ECM fit on 2009 scores 2010 total observed H on 605 common eligible high-water cycles. This second-port result is not a surge-corrected Table 2 reproduction; 42 of the paper's 44 network locations remain outside this run. See `reports/acceptance/P11.md` and `reports/results/model_port_period_target.csv`.
+## Tài liệu chính
 
-Replay commands are listed in the P11 acceptance report. If the ignored local source file is absent, download it from the public S3 object URL recorded in `data/source_inventory.csv`.
+- Bài báo Hibbert và cộng sự (2015): [bản lưu tại University of Liverpool](https://livrepository.liverpool.ac.uk/3179635/1/Hibbert_etal_2015.pdf).
+- Đối chiếu từng yêu cầu bài báo: [`docs/paper_map.csv`](docs/paper_map.csv).
+- Quyết định nguồn và nhánh gauge-only: [`reports/access_decision.md`](reports/access_decision.md).
+- Bàn giao và giải thích kết quả Avonmouth: [`reports/final_handoff_vi.md`](reports/final_handoff_vi.md).
+- Kiểm toán kết quả mạng lưới 2010: [`reports/final_network_review/final_acceptance_vi.md`](reports/final_network_review/final_acceptance_vi.md).
